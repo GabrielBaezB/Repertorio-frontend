@@ -1,0 +1,101 @@
+<div class="container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ isEditMode ? 'Editar' : 'Nuevo' }} Registro</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="loading-container" *ngIf="loading">
+        <mat-spinner diameter="50"></mat-spinner>
+      </div>
+
+      <div class="error-message" *ngIf="error">{{ error }}</div>
+
+      <form [formGroup]="registroForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
+
+        <div class="form-row">
+          <!-- <mat-form-field appearance="outline">
+            <mat-label>Folio</mat-label>
+            <input matInput formControlName="folio">
+          </mat-form-field> -->
+
+          <mat-form-field appearance="outline">
+            <mat-label>Repertorio</mat-label>
+            <input matInput formControlName="nro" required>
+            <mat-error *ngIf="submitted && registroForm.get('nro')?.errors?.['required']">
+              Este campo es obligatorio
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Año</mat-label>
+            <input matInput formControlName="ano" required>
+            <mat-error *ngIf="submitted && registroForm.get('ano')?.errors?.['required']">
+              Este campo es obligatorio
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Bimestre</mat-label>
+            <input matInput formControlName="bim">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Materia</mat-label>
+            <mat-select formControlName="materia" required>
+              <mat-option *ngFor="let materia of materias" [value]="materia">
+                {{ materia }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="submitted && registroForm.get('materia')?.errors?.['required']">
+              Este campo es obligatorio
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha Escritura</mat-label>
+            <input matInput formControlName="fesc" placeholder="DD/MM/YYYY">
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Nombre 1</mat-label>
+            <input matInput formControlName="nom1">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Nombre 2</mat-label>
+            <input matInput formControlName="nom2">
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>RUT 1</mat-label>
+            <input matInput formControlName="rut1" placeholder="Ej: 12345678-9">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>RUT 2</mat-label>
+            <input matInput formControlName="rut2" placeholder="Ej: 12345678-9">
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Observaciones</mat-label>
+          <textarea matInput formControlName="observacion" rows="3"></textarea>
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button mat-button type="button" [routerLink]="['/registros']">Cancelar</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="loading">
+            {{ isEditMode ? 'Actualizar' : 'Guardar' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

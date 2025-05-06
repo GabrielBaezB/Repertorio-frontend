@@ -1,0 +1,78 @@
+/* features/admin/roles/role-management.component.scss */
+.role-management-container {
+  padding: 20px;
+}
+
+.button-container {
+  margin-bottom: 20px;
+}
+
+.table-container {
+  position: relative;
+  min-height: 200px;
+
+  .loading-shade {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.15);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+table {
+  width: 100%;
+}
+
+mat-card-actions {
+  padding: 16px !important;
+  display: flex;
+  justify-content: flex-end;
+}
+.actions-container {
+  padding: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+.role-management-container {
+  padding: 20px;
+
+  .button-container {
+    margin-bottom: 20px;
+  }
+
+  .table-container {
+    position: relative;
+    min-height: 200px;
+    width: 100%;
+    overflow: auto;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  .loading-shade {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.15);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  mat-card-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px;
+  }
+}

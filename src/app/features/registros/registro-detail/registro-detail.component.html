@@ -1,0 +1,120 @@
+<div class="container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Detalles del Registro</mat-card-title>
+      <div class="spacer"></div>
+      <button mat-icon-button color="primary" [routerLink]="['/registros']">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="loading-container" *ngIf="loading">
+        <mat-spinner diameter="50"></mat-spinner>
+      </div>
+
+      <div class="error-message" *ngIf="error">{{ error }}</div>
+
+      <div class="registro-details" *ngIf="registro && !loading">
+        <div class="detail-header">
+          <div class="detail-id">ID: {{ registro.id }}</div>
+          <div class="detail-actions">
+            <button mat-icon-button color="primary" [routerLink]="['/registros/editar', registro.id]">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="deleteRegistro()">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="detail-section">
+          <h3>Información Básica</h3>
+          <div class="detail-grid">
+
+            <div class="detail-item">
+              <div class="detail-label">REPERTORIO:</div>
+              <div class="detail-value">{{ registro.nro }}</div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">Año:</div>
+              <div class="detail-value">{{ registro.ano }}</div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">Materia:</div>
+              <div class="detail-value">{{ registro.materia ? registro.materia : 'N/A' }}</div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">Fecha Escritura:</div>
+              <div class="detail-value">{{ registro.fesc ? registro.fesc : 'N/A' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="detail-section">
+          <h3>Información de Partes</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <div class="detail-label">CONCURRENTE 1:</div>
+              <div class="detail-value">{{ registro.nom1 ? registro.nom1 : 'N/A' }}</div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">RUT 1:</div>
+              <div class="detail-value">{{ registro.rut1 ? registro.rut1 : 'N/A' }}</div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">CONCURRENTE 2:</div>
+              <div class="detail-value">{{ registro.nom2 ? registro.nom2 : 'N/A' }}</div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">RUT 2:</div>
+              <div class="detail-value">{{ registro.rut2 ? registro.rut2 : 'N/A' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="detail-section">
+          <h3>Información Adicional</h3>
+          <div class="detail-item full-width">
+            <div class="detail-label">Observaciones:</div>
+            <div class="detail-value">{{ registro.observacion ? registro.observacion : 'Sin observaciones' }}</div>
+          </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="detail-section">
+          <h3>Metadatos</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <div class="detail-label">Fecha Creación:</div>
+              <div class="detail-value">{{ registro.createdAt ? (registro.createdAt | date:'dd/MM/yyyy HH:mm') : 'N/A' }}</div>
+            </div>
+
+            <div class="detail-item">
+              <div class="detail-label">Última Actualización:</div>
+              <div class="detail-value">{{ registro.updatedAt ? (registro.updatedAt | date:'dd/MM/yyyy HH:mm') : 'N/A' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions *ngIf="registro && !loading">
+      <button mat-button [routerLink]="['/registros']">Volver a la lista</button>
+      <button mat-raised-button color="primary" [routerLink]="['/registros/editar', registro.id]">Editar</button>
+    </mat-card-actions>
+  </mat-card>
+</div>

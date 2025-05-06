@@ -1,0 +1,61 @@
+<!-- features/admin/dashboard/admin-dashboard.component.html -->
+<div class="admin-dashboard">
+  <h1 class="mat-h1">Panel de Administración</h1>
+
+  <div class="admin-cards">
+    <mat-card>
+      <mat-card-header>
+        <mat-icon mat-card-avatar>people</mat-icon>
+        <mat-card-title>Usuarios</mat-card-title>
+        <mat-card-subtitle>Gestión de usuarios del sistema</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Total de usuarios: {{ totalUsers }}</p>
+        <p>Usuarios activos: {{ activeUsers }}</p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-button color="primary" [routerLink]="['/admin/usuarios']">
+          <mat-icon>list</mat-icon> Ver Usuarios
+        </button>
+        <button mat-button color="accent" [routerLink]="['/admin/usuarios/nuevo']">
+          <mat-icon>person_add</mat-icon> Nuevo Usuario
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header>
+        <mat-icon mat-card-avatar>security</mat-icon>
+        <mat-card-title>Roles y Permisos</mat-card-title>
+        <mat-card-subtitle>Configuración de accesos</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Configura roles y permisos para los diferentes usuarios del sistema.</p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-button color="primary" [routerLink]="['/admin/roles']">
+          <mat-icon>admin_panel_settings</mat-icon> Gestionar Roles
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- <mat-card>
+      <mat-card-header>
+        <mat-icon mat-card-avatar>settings</mat-icon>
+        <mat-card-title>Configuración</mat-card-title>
+        <mat-card-subtitle>Parámetros del sistema</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Ajusta parámetros globales del sistema notarial.</p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-button color="primary" [routerLink]="['/admin/configuracion']">
+          <mat-icon>tune</mat-icon> Configurar Sistema
+        </button>
+      </mat-card-actions>
+    </mat-card> -->
+  </div>
+  <div class="admin-content">
+    <router-outlet></router-outlet>
+  </div>
+</div>

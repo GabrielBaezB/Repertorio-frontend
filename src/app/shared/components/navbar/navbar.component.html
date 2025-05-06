@@ -1,0 +1,56 @@
+<!-- navbar.component.html -->
+<mat-toolbar color="primary" class="toolbar">
+  <a mat-button routerLink="/dashboard" class="brand">
+    <span>Repertorio Notarial</span>
+  </a>
+
+  <span class="spacer"></span>
+
+  <div class="nav-links">
+    <a mat-button routerLink="/dashboard" routerLinkActive="active">
+      <mat-icon>dashboard</mat-icon>
+      Dashboard
+    </a>
+
+    <button mat-button [matMenuTriggerFor]="registrosMenu">
+      <mat-icon>library_books</mat-icon>
+      Registros
+    </button>
+    <mat-menu #registrosMenu="matMenu">
+      <a mat-menu-item routerLink="/registros">
+        <mat-icon>list</mat-icon>
+        Listar Registros
+      </a>
+      <a mat-menu-item routerLink="/registros/buscar">
+        <mat-icon>search</mat-icon>
+        Búsqueda Avanzada
+      </a>
+      <a mat-menu-item routerLink="/registros/nuevo">
+        <mat-icon>add</mat-icon>
+        Nuevo Registro
+      </a>
+    </mat-menu>
+
+    <!-- Enlace de administración solo para admins -->
+    <ng-container *ngIf="isAdmin">
+      <a mat-button routerLink="/admin" routerLinkActive="active">
+        <mat-icon>admin_panel_settings</mat-icon>
+        Administración
+      </a>
+    </ng-container>
+
+    <button mat-button [matMenuTriggerFor]="userMenu">
+      <mat-icon>account_circle</mat-icon>
+      {{ username }}
+    </button>
+    <mat-menu #userMenu="matMenu">
+      <button mat-menu-item disabled>
+        <span>Roles: {{ roles.join(', ') }}</span>
+      </button>
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>exit_to_app</mat-icon>
+        <span>Cerrar sesión</span>
+      </button>
+    </mat-menu>
+  </div>
+</mat-toolbar>

@@ -1,0 +1,91 @@
+.container {
+  padding: 20px;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 30px;
+}
+
+.error-message {
+  color: red;
+  padding: 15px;
+  text-align: center;
+}
+
+.registro-details {
+  padding: 16px 0;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.detail-id {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.detail-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.detail-section {
+  padding: 16px 0;
+}
+
+h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #3f51b5;
+  font-weight: 500;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.detail-item {
+  margin-bottom: 8px;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.detail-value {
+  color: #333;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+mat-divider {
+  margin: 16px 0;
+}
+
+mat-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 16px 16px;
+}
+
+@media (max-width: 768px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}

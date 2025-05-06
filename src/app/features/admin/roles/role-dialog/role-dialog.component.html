@@ -1,0 +1,39 @@
+<h2 mat-dialog-title>{{ isEditMode ? 'Editar' : 'Crear' }} Rol</h2>
+
+<form [formGroup]="roleForm" (ngSubmit)="onSubmit()">
+  <div mat-dialog-content>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nombre*</mat-label>
+      <input matInput formControlName="name" placeholder="Nombre del rol">
+      <mat-error *ngIf="roleForm.get('name')?.hasError('required')">
+        El nombre es obligatorio
+      </mat-error>
+      <mat-error *ngIf="roleForm.get('name')?.hasError('minlength')">
+        El nombre debe tener al menos 3 caracteres
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Descripción*</mat-label>
+      <textarea matInput formControlName="description" placeholder="Descripción del rol"></textarea>
+    </mat-form-field>
+
+    <div class="permissions-section">
+      <h3>Permisos:</h3>
+      <div formGroupName="permissions" class="permissions-grid">
+        <div *ngFor="let permission of availablePermissions" class="permission-item">
+          <mat-checkbox [formControlName]="permission.value">
+            {{ permission.name }}
+          </mat-checkbox>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="onCancel()">Cancelar</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="roleForm.invalid">
+      {{ isEditMode ? 'Actualizar' : 'Crear' }}
+    </button>
+  </div>
+</form>

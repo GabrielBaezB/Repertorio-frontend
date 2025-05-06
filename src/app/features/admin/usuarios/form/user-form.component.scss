@@ -1,0 +1,35 @@
+/* features/admin/usuarios/form/user-form.component.scss */
+.user-form-container {
+  padding: 20px;
+}
+
+.form-row {
+  margin-bottom: 16px;
+
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+.form-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.loading-shade {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.15);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+mat-card {
+  position: relative;
+}

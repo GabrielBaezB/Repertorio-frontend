@@ -1,0 +1,118 @@
+<div class="container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Búsqueda Avanzada</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+        <div class="search-fields">
+          <mat-form-field appearance="outline">
+            <mat-label>Compareciente 1</mat-label>
+            <input matInput formControlName="nom1">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Compareciente 2</mat-label>
+            <input matInput formControlName="nom2">
+          </mat-form-field>
+
+          <!-- <mat-form-field appearance="outline">
+            <mat-label>Repertorio</mat-label>
+            <input matInput formControlName="nro">
+          </mat-form-field> -->
+
+          <mat-form-field appearance="outline">
+            <mat-label>Año</mat-label>
+            <input matInput formControlName="ano">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Materia</mat-label>
+            <input matInput formControlName="materia">
+          </mat-form-field>
+        </div>
+          <!-- Nuevos botones de exportación -->
+        <div class="export-actions">
+          <button mat-raised-button color="accent" type="button" (click)="exportToExcel()"
+            [disabled]="!searchForm.get('ano')?.value">
+            <mat-icon>description</mat-icon> Exportar Año
+          </button>
+          <button mat-raised-button color="accent" type="button" (click)="exportToExcelFiltered()"
+            [disabled]="!isFormValid()">
+            <mat-icon>file_download</mat-icon> Exportar Filtrados
+          </button>
+        </div>
+        <div class="search-actions">
+
+
+          <button mat-button type="button" (click)="clearSearch()">Limpiar</button>
+
+          <button mat-raised-button color="primary" type="submit">Buscar</button>
+        </div>
+      </form>
+
+      <div class="loading-container" *ngIf="loading">
+        <mat-spinner diameter="50"></mat-spinner>
+      </div>
+
+      <div class="error-message" *ngIf="error">{{ error }}</div>
+      <div class="no-results" *ngIf="searched && registros.length === 0 && !loading">
+        No se encontraron resultados.
+      </div>
+
+      <div class="results-container" *ngIf="registros.length > 0 && !loading">
+        <h3>Resultados de la búsqueda</h3>
+        <table mat-table [dataSource]="registros">
+          <!-- Definición de columnas -->
+          <ng-container matColumnDef="nom1">
+            <th mat-header-cell *matHeaderCellDef>Concurr. 1</th>
+            <td mat-cell *matCellDef="let r">{{ r.nom1 }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="nom2">
+            <th mat-header-cell *matHeaderCellDef>Concurr. 2</th>
+            <td mat-cell *matCellDef="let r">{{ r.nom2 }}</td>
+          </ng-container>
+
+          <!-- <ng-container matColumnDef="nro">
+            <th mat-header-cell *matHeaderCellDef>Repertorio</th>
+            <td mat-cell *matCellDef="let r">{{ r.nro }}</td>
+          </ng-container> -->
+
+          <ng-container matColumnDef="ano">
+            <th mat-header-cell *matHeaderCellDef>Año</th>
+            <td mat-cell *matCellDef="let r">{{ r.ano }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="materia">
+            <th mat-header-cell *matHeaderCellDef>Materia</th>
+            <td mat-cell *matCellDef="let r">{{ r.materia }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Acciones</th>
+            <td mat-cell *matCellDef="let r">
+              <button mat-icon-button color="primary" [routerLink]="['/registros/ver', r.id]">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button mat-icon-button color="accent" [routerLink]="['/registros/editar', r.id]">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="exportToPdf(r.id); $event.stopPropagation()">
+                <mat-icon>picture_as_pdf</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <mat-paginator [length]="totalItems" [pageSize]="pageSize" [pageIndex]="pageIndex"
+          [pageSizeOptions]="[5, 10, 25, 100]" (page)="onPageChange($event)"
+          aria-label="Seleccionar página de registros">
+        </mat-paginator>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

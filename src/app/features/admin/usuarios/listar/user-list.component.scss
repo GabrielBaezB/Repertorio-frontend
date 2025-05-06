@@ -1,0 +1,47 @@
+// user-list.component.scss
+.user-list-container {
+  padding: 20px;
+
+  .table-container {
+    position: relative;
+    min-height: 200px;
+    overflow: auto;
+    width: 100%;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  .loading-shade {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.15);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  mat-form-field {
+    margin-right: 12px;
+  }
+}
+
+/* Para asegurar que la tabla es visible */
+.mat-mdc-table {
+  display: table !important;
+  width: 100%;
+}
+
+.mat-mdc-row, .mat-mdc-header-row {
+  display: table-row !important;
+}
+
+.mat-mdc-cell, .mat-mdc-header-cell {
+  display: table-cell !important;
+  padding: 0 16px;
+}
