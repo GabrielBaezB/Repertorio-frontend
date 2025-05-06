@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://repertorionotarial.netlify.app'
+  apiUrl: 'https://abcc-186-189-103-232.ngrok-free.app'
 };
 
 // export const environment = {
