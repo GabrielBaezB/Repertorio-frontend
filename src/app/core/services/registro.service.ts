@@ -97,7 +97,12 @@ export class RegistroService {
 
   // Método para exportar registros a Excel por año
   exportToExcel(ano: string): Observable<Blob> {
-    return this.http.get(`${environment.apiUrl}/export/excel/${ano}`, {
+    const headers = new HttpHeaders({
+      'ngrok-skip-browser-warning': 'true'
+    });
+
+    return this.http.get(`${this.API_URL}/export/excel/${ano}`, {
+      headers,
       responseType: 'blob'
     });
   }
@@ -113,14 +118,27 @@ export class RegistroService {
       }
     });
 
-    return this.http.get(`${environment.apiUrl}/export/excel-filtrado`, {
+    const headers = new HttpHeaders({
+      'ngrok-skip-browser-warning': 'true'
+    });
+
+    return this.http.get(`${this.API_URL}/export/excel-filtrado`, {
+      headers,
       params: httpParams,
       responseType: 'blob'
     });
+
+
   }
   // Método para exportar un registro individual a PDF
   exportToPdf(id: number): Observable<Blob> {
-    return this.http.get(`${environment.apiUrl}/export/pdf/${id}`, {
+    // Usar la misma base URL que los otros métodos
+    const headers = new HttpHeaders({
+      'ngrok-skip-browser-warning': 'true'
+    });
+
+    return this.http.get(`${this.API_URL}/export/pdf/${id}`, {
+      headers,
       responseType: 'blob'
     });
   }
