@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Registro } from '../models/registro.model';
 import { environment } from '../../../environments/environment';
@@ -8,9 +8,16 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export class RegistroService {
-  private readonly API_URL = `${environment.apiUrl}/registros`;
+  // private readonly API_URL = `${environment.apiUrl}/registros`;
 
-  constructor(private http: HttpClient) {}
+  private readonly API_URL = environment.production
+  ? 'https://b0f3-186-189-95-84.ngrok-free.app/api/registros'  // URL directa
+  : `${environment.apiUrl}/api/registros`;  // URL de desarrollo
+
+  constructor(private http: HttpClient) {
+    console.log('API_URL configurada:', this.API_URL);
+  }
+
 
   getAll(page = 0, size = 10, sort = 'createdAt,desc'): Observable<any> {
     const params = new HttpParams()
@@ -18,7 +25,13 @@ export class RegistroService {
       .set('size', size.toString())
       .set('sort', sort);
 
-    return this.http.get<any>(this.API_URL, { params });
+    // Añadir encabezados específicos para ngrok
+    console.log('Parámetros:', params.toString());
+    const headers = new HttpHeaders({
+      'ngrok-skip-browser-warning': 'true'
+    });
+    console.log('Realizando solicitud a:', this.API_URL);
+    return this.http.get<any>(this.API_URL, { params, headers });
   }
 
   getById(id: number): Observable<Registro> {
@@ -38,7 +51,7 @@ export class RegistroService {
   }
 
   search(params: any): Observable<any> {
-    return this.http.get<any>(`${this.API_URL}/buscar`, { params });
+    return this.http.get<any>(`${this.API_URL}/buscar`, { params, headers: { 'ngrok-skip-browser-warning': 'true' } });
   }
 
 
@@ -64,7 +77,7 @@ export class RegistroService {
     if (ano)     { params = params.set('ano',     ano); }
     if (materia) { params = params.set('materia', materia); }
 
-    return this.http.get<any>(`${this.API_URL}/buscar`, { params });
+    return this.http.get<any>(`${this.API_URL}/buscar`, { params, headers: { 'ngrok-skip-browser-warning': 'true' } });
   }
 
   globalSearch(
@@ -79,7 +92,7 @@ export class RegistroService {
       .set('size', size.toString())
       .set('sort', sort);
 
-    return this.http.get<any>(`${this.API_URL}/search`, { params });
+    return this.http.get<any>(`${this.API_URL}/search`, { params, headers: { 'ngrok-skip-browser-warning': 'true' } });
   }
 
   // Método para exportar registros a Excel por año
