@@ -96,13 +96,14 @@ export class RegistroService {
   }
 
   exportToExcel(ano: string): Observable<Blob> {
+    // Usar la ruta relativa
+    const url = `/api/export/excel/${ano}`;
+
     const headers = new HttpHeaders({
-      'ngrok-skip-browser-warning': 'true',
       'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
     });
 
-    // URL directa a Ngrok
-    return this.http.get(`https://b0f3-186-189-95-84.ngrok-free.app/api/registros/export/excel/${ano}`, {
+    return this.http.get(url, {
       headers,
       responseType: 'blob'
     });
@@ -116,13 +117,14 @@ export class RegistroService {
       }
     });
 
+    const url = `/api/export/excel-filtrado`;
+
     const headers = new HttpHeaders({
-      'ngrok-skip-browser-warning': 'true',
+      // 'ngrok-skip-browser-warning': 'true',
       'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
     });
 
-    // URL directa a Ngrok
-    return this.http.get(`https://b0f3-186-189-95-84.ngrok-free.app/api/registros/export/excel-filtrado`, {
+    return this.http.get(url, {
       headers,
       params: httpParams,
       responseType: 'blob'
@@ -131,12 +133,13 @@ export class RegistroService {
   // Método para exportar un registro individual a PDF
   exportToPdf(id: number): Observable<Blob> {
     // Usar directamente la URL de Ngrok para respuestas binarias
-    const url = 'https://b0f3-186-189-95-84.ngrok-free.app/api/export/pdf/' + id;
+    // const url = 'https://b0f3-186-189-95-84.ngrok-free.app/api/export/pdf/' + id;
+    const url = `/api/export/pdf/${id}`;
 
-    console.log('Exportando PDF desde URL directa de Ngrok:', url);
+    console.log('Exportando PDF a través de Netlify:', url);
 
     const headers = new HttpHeaders({
-      'ngrok-skip-browser-warning': 'true',
+      // 'ngrok-skip-browser-warning': 'true',
       'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
     });
 

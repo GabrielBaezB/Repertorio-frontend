@@ -1,15 +1,22 @@
 # netlify.toml
 
-[[redirects]]
-  from = "/api/*"
-  to = "https://b0f3-186-189-95-84.ngrok-free.app/:splat"
-  status = 200
-  force = true
-  headers = {Access-Control-Allow-Origin = "*"}
-
 [[headers]]
   for = "/*"
   [headers.values]
     Access-Control-Allow-Origin = "*"
     Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
     Access-Control-Allow-Headers = "Origin, X-Requested-With, Content-Type, Accept, Authorization, ngrok-skip-browser-warning"
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://b0f3-186-189-95-84.ngrok-free.app/api/:splat"
+  status = 200
+  force = true
+  headers = {
+    Access-Control-Allow-Origin = "*",
+    Access-Control-Allow-Headers = "Origin,
+    X-Requested-With,
+    Content-Type,
+    Accept,
+    Authorization,
+    ngrok-skip-browser-warning"}
