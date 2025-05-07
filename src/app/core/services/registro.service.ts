@@ -134,10 +134,11 @@ export class RegistroService {
   exportToPdf(id: number): Observable<Blob> {
     // Usar directamente la URL de Ngrok para respuestas binarias
     // const url = 'https://b0f3-186-189-95-84.ngrok-free.app/api/export/pdf/' + id;
-    const url = `/api/export/pdf/${id}`;
+    // const url = `/api/export/pdf/${id}`;
+    const url = `/api/export/static-pdf/${id}`;
 
-    console.log('Exportando PDF a través de Netlify:', url);
-
+    // console.log('Exportando PDF a través de Netlify:', url);
+    console.log('Exportando PDF estático a través de Netlify:', url);
     const headers = new HttpHeaders({
       // 'ngrok-skip-browser-warning': 'true',
       'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
@@ -160,5 +161,21 @@ export class RegistroService {
         return throwError(() => error);
       })
     );
+  }
+
+  // Método de respaldo que usa el endpoint dinámico original
+  private exportToPdfDynamic(id: number): Observable<Blob> {
+    const url = `/api/export/pdf/${id}`;
+
+    console.log('Exportando PDF dinámico como respaldo:', url);
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+    });
+
+    return this.http.get(url, {
+      headers,
+      responseType: 'blob'
+    });
   }
 }
