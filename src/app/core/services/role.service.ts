@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { Role } from '../models/role.model';
@@ -9,15 +9,33 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export class RoleService {
-  private readonly API_URL = `${environment.apiUrl}/roles`;
+  // private readonly API_URL = `${environment.apiUrl}/roles`;
 
-  constructor(private http: HttpClient) {}
+  private readonly API_URL = environment.production
+    ? 'https://b0f3-186-189-95-84.ngrok-free.app/api/roles'  // URL directa
+    : `${environment.apiUrl}/api/roles`;
+     // URL de desarrollo
+  constructor(private http: HttpClient) {
+    console.log('API_URL configurada:', this.API_URL);
+  }
 
   getAll(): Observable<Role[]> {
-    return this.http.get<Role[]>(this.API_URL).pipe(
+
+    const headers = new HttpHeaders({
+      'ngrok-skip-browser-warning': 'true'
+    });
+
+    console.log('Solicitando todos los roles desde:', this.API_URL);
+
+    return this.http.get<Role[]>(this.API_URL, {headers}).pipe(
       tap(roles => console.log('Roles cargados:', roles)),
       catchError(error => {
-        console.error('Error al cargar roles', error);
+        console.error('========= ERROR AL CARGAR ROLES =========');
+        console.error('Status:', error.status);
+        console.error('Mensaje:', error.message);
+        console.error('Error completo:', error);
+        console.error('Error body:', error.error);
+        console.error('=========================================');
         throw error;
       })
     );
