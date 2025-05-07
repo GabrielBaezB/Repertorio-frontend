@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { catchError, Observable, throwError } from 'rxjs';
 import { Registro } from '../models/registro.model';
 import { environment } from '../../../environments/environment';
 
@@ -11,8 +11,8 @@ export class RegistroService {
   // private readonly API_URL = `${environment.apiUrl}/registros`;
 
   private readonly API_URL = environment.production
-  ? 'https://b0f3-186-189-95-84.ngrok-free.app/api/registros'  // URL directa
-  : `${environment.apiUrl}/api/registros`;  // URL de desarrollo
+    ? 'https://b0f3-186-189-95-84.ngrok-free.app/api/registros'  // URL directa
+    : `${environment.apiUrl}/api/registros`;  // URL de desarrollo
 
   constructor(private http: HttpClient) {
     console.log('API_URL configurada:', this.API_URL);
@@ -68,13 +68,13 @@ export class RegistroService {
     sort: string = 'createdAt,desc'
   ): Observable<any> {
     let params = new HttpParams()
-      .set('page',  page.toString())
-      .set('size',  size.toString())
-      .set('sort',  sort);
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sort', sort);
 
-    if (nom1)    { params = params.set('nom1',    nom1); }
-    if (nom2)    { params = params.set('nom2',    nom2); }
-    if (ano)     { params = params.set('ano',     ano); }
+    if (nom1) { params = params.set('nom1', nom1); }
+    if (nom2) { params = params.set('nom2', nom2); }
+    if (ano) { params = params.set('ano', ano); }
     if (materia) { params = params.set('materia', materia); }
 
     return this.http.get<any>(`${this.API_URL}/buscar`, { params, headers: { 'ngrok-skip-browser-warning': 'true' } });
@@ -95,23 +95,21 @@ export class RegistroService {
     return this.http.get<any>(`${this.API_URL}/search`, { params, headers: { 'ngrok-skip-browser-warning': 'true' } });
   }
 
-  // Método para exportar registros a Excel por año
   exportToExcel(ano: string): Observable<Blob> {
     const headers = new HttpHeaders({
-      'ngrok-skip-browser-warning': 'true'
+      'ngrok-skip-browser-warning': 'true',
+      'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
     });
 
-    return this.http.get(`${this.API_URL}/export/excel/${ano}`, {
+    // URL directa a Ngrok
+    return this.http.get(`https://b0f3-186-189-95-84.ngrok-free.app/api/registros/export/excel/${ano}`, {
       headers,
       responseType: 'blob'
     });
   }
 
-  // Método para exportar registros a Excel con filtros
   exportToExcelFiltered(params: any): Observable<Blob> {
-    // Construir parámetros de consulta a partir del objeto de parámetros
     let httpParams = new HttpParams();
-
     Object.keys(params).forEach(key => {
       if (params[key] !== '' && params[key] !== null && params[key] !== undefined) {
         httpParams = httpParams.set(key, params[key]);
@@ -119,32 +117,45 @@ export class RegistroService {
     });
 
     const headers = new HttpHeaders({
-      'ngrok-skip-browser-warning': 'true'
+      'ngrok-skip-browser-warning': 'true',
+      'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
     });
 
-    return this.http.get(`${this.API_URL}/export/excel-filtrado`, {
+    // URL directa a Ngrok
+    return this.http.get(`https://b0f3-186-189-95-84.ngrok-free.app/api/registros/export/excel-filtrado`, {
       headers,
       params: httpParams,
       responseType: 'blob'
     });
-
-
   }
   // Método para exportar un registro individual a PDF
   exportToPdf(id: number): Observable<Blob> {
+    // Usar directamente la URL de Ngrok para respuestas binarias
+    const url = 'https://b0f3-186-189-95-84.ngrok-free.app/api/export/pdf/' + id;
+
+    console.log('Exportando PDF desde URL directa de Ngrok:', url);
+
     const headers = new HttpHeaders({
       'ngrok-skip-browser-warning': 'true',
       'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-    })
+    });
 
-    return this.http.get(
-      environment.production
-        ? `https://b0f3-186-189-95-84.ngrok-free.app/api/export/pdf/${id}`  // URL directa
-        : `/api/export/pdf/${id}`,  // URL para desarrollo
-      {
-        headers,
-        responseType: 'blob'
-      }
+    return this.http.get(url, {
+      headers,
+      responseType: 'blob'
+    }).pipe(
+      catchError(error => {
+        console.error('Error al exportar PDF:', error);
+
+        // Proporcionar mensajes personalizados según el error
+        if (error.status === 404) {
+          return throwError(() => new Error('El registro solicitado no existe'));
+        } else if (error.status === 500) {
+          return throwError(() => new Error('Error al generar el PDF. Inténtelo más tarde'));
+        }
+
+        return throwError(() => error);
+      })
     );
   }
 }
