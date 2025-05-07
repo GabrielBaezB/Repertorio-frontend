@@ -132,14 +132,19 @@ export class RegistroService {
   }
   // Método para exportar un registro individual a PDF
   exportToPdf(id: number): Observable<Blob> {
-    // Usar la misma base URL que los otros métodos
     const headers = new HttpHeaders({
-      'ngrok-skip-browser-warning': 'true'
-    });
+      'ngrok-skip-browser-warning': 'true',
+      'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+    })
 
-    return this.http.get(`${this.API_URL}/export/pdf/${id}`, {
-      headers,
-      responseType: 'blob'
-    });
+    return this.http.get(
+      environment.production
+        ? `https://b0f3-186-189-95-84.ngrok-free.app/api/export/pdf/${id}`  // URL directa
+        : `/api/export/pdf/${id}`,  // URL para desarrollo
+      {
+        headers,
+        responseType: 'blob'
+      }
+    );
   }
 }

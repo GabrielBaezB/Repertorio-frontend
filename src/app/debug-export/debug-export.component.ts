@@ -52,8 +52,8 @@ export class DebugExportComponent {
     this.success = false;
     this.pdfBlob = null;
 
-    // Probar diferentes rutas para identificar cuál funciona
-    this.testUrl(`https://b0f3-186-189-95-84.ngrok-free.app/api/registros/${this.registroId}/pdf`);
+    // Probar con la URL que funciona en Postman
+    this.testUrl(`https://b0f3-186-189-95-84.ngrok-free.app/api/export/pdf/${this.registroId}`);
   }
 
   testUrl(url: string) {
