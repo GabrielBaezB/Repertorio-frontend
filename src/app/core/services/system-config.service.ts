@@ -9,7 +9,7 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export class SystemConfigService {
-  private readonly API_URL = `${environment.apiUrl}/api/config`;
+  private readonly API_URL = `${environment.apiUrl}/config`;
 
   constructor(private http: HttpClient) {}
 

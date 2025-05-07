@@ -8,7 +8,7 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export class RegistroService {
-  private readonly API_URL = `${environment.apiUrl}/api/registros`;
+  private readonly API_URL = `${environment.apiUrl}/registros`;
 
   constructor(private http: HttpClient) {}
 
@@ -84,7 +84,7 @@ export class RegistroService {
 
   // Método para exportar registros a Excel por año
   exportToExcel(ano: string): Observable<Blob> {
-    return this.http.get(`${environment.apiUrl}/api/export/excel/${ano}`, {
+    return this.http.get(`${environment.apiUrl}/export/excel/${ano}`, {
       responseType: 'blob'
     });
   }
@@ -100,14 +100,14 @@ export class RegistroService {
       }
     });
 
-    return this.http.get(`${environment.apiUrl}/api/export/excel-filtrado`, {
+    return this.http.get(`${environment.apiUrl}/export/excel-filtrado`, {
       params: httpParams,
       responseType: 'blob'
     });
   }
   // Método para exportar un registro individual a PDF
   exportToPdf(id: number): Observable<Blob> {
-    return this.http.get(`${environment.apiUrl}/api/export/pdf/${id}`, {
+    return this.http.get(`${environment.apiUrl}/export/pdf/${id}`, {
       responseType: 'blob'
     });
   }
