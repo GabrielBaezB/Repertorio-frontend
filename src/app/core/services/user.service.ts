@@ -1,6 +1,6 @@
 // core/services/user.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { catchError, Observable, tap, throwError } from 'rxjs';
 import { User } from '../models/user.model';
 import { environment } from '../../../environments/environment';
@@ -9,18 +9,32 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export class UserService {
-  private readonly API_URL = `${environment.apiUrl}/users`;
+  // private readonly API_URL = `${environment.apiUrl}/users`;
 
-  constructor(private http: HttpClient) { }
+  private readonly API_URL = environment.production
+  ? 'https://b0f3-186-189-95-84.ngrok-free.app/api/users'  // URL directa
+  : `${environment.apiUrl}/api/users`;  // URL de desarrollo
 
-  // En user.service.ts
-  getAll(page = 0, size = 10): Observable<any> {
+  constructor(private http: HttpClient) {
+    console.log('API_URL configurada:', this.API_URL);
+   }
+
+  getAll(page = 0, size = 10, sort = 'createdAt,desc'): Observable<any> {
     console.log(`Consultando usuarios - página ${page}, tamaño ${size}`);
     const params = new HttpParams()
       .set('page', page.toString())
-      .set('size', size.toString());
+      .set('size', size.toString())
+      .set('sort', sort);
 
-    return this.http.get<any>(this.API_URL, { params }).pipe(
+      // Añadir encabezados específicos para ngrok
+      console.log('Parámetros:', params.toString());
+      const headers = new HttpHeaders({
+        'ngrok-skip-browser-warning': 'true'
+      });
+
+      console.log('Getting users from:', this.API_URL);
+
+    return this.http.get<any>(this.API_URL, { params, headers }).pipe(
       tap(response => {
         console.log('===== Respuesta del servidor =====');
         console.log('Datos recibidos:', response);
@@ -94,7 +108,7 @@ export class UserService {
       .set('page', page.toString())
       .set('size', size.toString());
 
-    return this.http.get<any>(`${this.API_URL}/search`, { params }).pipe(
+    return this.http.get<any>(`${this.API_URL}/search`, { params, headers: { 'ngrok-skip-browser-warning': 'true' } }).pipe(
       catchError(error => {
         console.error('Error searching users', error);
         return throwError(() => new Error('Error buscando usuarios'));
