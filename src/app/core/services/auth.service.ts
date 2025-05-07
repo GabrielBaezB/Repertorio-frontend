@@ -140,6 +140,7 @@ export class AuthService {
 
   // Método para validar el token manualmente (útil para guards)
   validateToken(): Observable<boolean> {
+    console.log('Validando token con el servidor...');
     const token = this.getToken();
     if (!this.getToken()) {
       console.log('No hay token disponible, retornando false');
