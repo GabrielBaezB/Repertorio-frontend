@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, tap, catchError, throwError, of, map } from 'rxjs';
 import { LoginRequest, LoginResponse, UserInfo } from '../models/auth.model';
@@ -87,13 +87,20 @@ export class AuthService {
   }
 
   private loadUserInfo(): void {
+    const token = this.getToken();
     if (!this.getToken()) {
       return;
     }
 
     console.log('Intentando cargar información del usuario desde API');
 
-    this.http.get<UserInfo>(`${this.API_URL}/me`).pipe(
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'ngrok-skip-browser-warning': 'true'
+    });
+
+    this.http.get<UserInfo>(`${this.API_URL}/me`, { headers }).pipe(
       tap(user => {
         console.log('Información del usuario cargada correctamente:', user);
         console.log('Roles del usuario:', user.roles);
@@ -133,6 +140,7 @@ export class AuthService {
 
   // Método para validar el token manualmente (útil para guards)
   validateToken(): Observable<boolean> {
+    const token = this.getToken();
     if (!this.getToken()) {
       console.log('No hay token disponible, retornando false');
       return of(false);
@@ -140,7 +148,14 @@ export class AuthService {
 
     console.log('Validando token...');
 
-    return this.http.get<UserInfo>(`${this.API_URL}/me`).pipe(
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'ngrok-skip-browser-warning': 'true'
+    });
+
+
+    return this.http.get<UserInfo>(`${this.API_URL}/me`, { headers }).pipe(
       tap(user => {
         console.log('Token válido, información de usuario:', user);
         console.log('Roles del usuario:', user.roles);
