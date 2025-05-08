@@ -1,129 +1,93 @@
-// src/app/services/pdf-generator.service.ts
+// src/app/core/services/pdf-generator.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, map, catchError, throwError } from 'rxjs';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { environment } from '../../../environments/environment';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class PdfGeneratorService {
+  private readonly BASE = environment.production
+    ? 'https://b0f3-186-189-95-84.ngrok-free.app/api'
+    : '/api';                   // Netlify proxy o `ng serve --proxy`
+
   constructor(private http: HttpClient) {}
 
-  // Obtener datos del registro
-  getRegistroData(id: number): Observable<any> {
-    return this.http.get<any>(`/api/export/pdf-data/${id}`).pipe(
-      catchError(error => {
-        console.error('Error al obtener datos del registro:', error);
-        return throwError(() => new Error('No se pudieron obtener los datos del registro.'));
+  /** Descarga el JSON del registro */
+  private getData(id: number) {
+    const headers = new HttpHeaders({
+      'ngrok-skip-browser-warning': 'true',
+      Authorization: `Bearer ${localStorage.getItem('token') ?? ''}`
+    });
+
+    return this.http.get<any>(`${this.BASE}/export/pdf-data/${id}`, { headers }).pipe(
+      catchError(err => {
+        console.error('No se pudo obtener el registro', err);
+        return throwError(() => new Error('No se pudo obtener el registro'));
       })
     );
   }
 
-  // Generar y descargar PDF
-  generatePdf(id: number): Observable<void> {
-    return this.getRegistroData(id).pipe(
-      map(data => {
-        // Crear documento PDF
-        const doc = new jsPDF();
-
-        // Configurar título
-        doc.setFontSize(18);
-        doc.setFont('helvetica', 'bold');
-        doc.text('CERTIFICADO DE REPERTORIO', doc.internal.pageSize.width / 2, 20, { align: 'center' });
-
-        // Crear tabla con los datos
-        const tableBody: string[][] = [];
-
-        // Añadir filas a la tabla, siguiendo el mismo orden que en el backend
-        this.addTableRow(tableBody, 'N° Repertorio:', data.nro || '');
-        this.addTableRow(tableBody, 'Folio:', data.foj || '');
-        this.addTableRow(tableBody, 'Año:', data.ano || '');
-        this.addTableRow(tableBody, 'Fecha Escritura:', data.fesc || '');
-        this.addTableRow(tableBody, 'Compareciente 1:', data.nom1 || '');
-
-        // Formatear RUT1 como en el backend
-        const rut1 = data.rut1 ?
-          `${data.rut1}${data.rut1d ? '-' + data.rut1d : ''}` : '';
-        this.addTableRow(tableBody, 'RUT 1:', rut1);
-
-        // Añadir Compareciente 2 y RUT 2 solo si existe
-        if (data.nom2) {
-          this.addTableRow(tableBody, 'Compareciente 2:', data.nom2);
-          const rut2 = data.rut2 ?
-            `${data.rut2}${data.rut2d ? '-' + data.rut2d : ''}` : '';
-          this.addTableRow(tableBody, 'RUT 2:', rut2);
-        }
-
-        // Añadir campos opcionales solo si existen
-        if (data.cont) this.addTableRow(tableBody, 'Tipo Documento:', data.cont);
-        if (data.materia) this.addTableRow(tableBody, 'Materia:', data.materia);
-        if (data.req) this.addTableRow(tableBody, 'Requirente:', data.req);
-        if (data.abog) this.addTableRow(tableBody, 'Abogado:', data.abog);
-        if (data.nBoleta) this.addTableRow(tableBody, 'N° Boleta:', data.nBoleta);
-        if (data.aran) this.addTableRow(tableBody, 'Arancel:', data.aran);
-        if (data.observacion) this.addTableRow(tableBody, 'Observaciones:', data.observacion);
-
-        // Configurar y añadir la tabla al documento
-        autoTable(doc, {
-          startY: 30,
-          head: [], // Sin encabezado
-          body: tableBody,
-          theme: 'grid',
-          columnStyles: {
-            0: {
-              cellWidth: 60,
-              fillColor: [211, 211, 211], // Light Gray para simular el estilo del backend
-              fontStyle: 'bold'
-            },
-            1: { cellWidth: 'auto' }
-          },
-          styles: {
-            fontSize: 10,
-            cellPadding: 5
-          },
-          margin: { left: 20, right: 20 }
-        });
-
-        // Añadir pie de página
-        const finalY = (doc as any).lastAutoTable.finalY || 150;
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(10);
-        doc.text(
-          'Este documento es una constancia del registro notarial y no constituye copia autorizada del instrumento.',
-          doc.internal.pageSize.width / 2,
-          finalY + 20,
-          { align: 'center', maxWidth: 170 }
-        );
-
-        // Descargar PDF
-        doc.save(`registro_${id}.pdf`);
-      }),
-      catchError(error => {
-        console.error('Error al generar PDF:', error);
-        return throwError(() => new Error('Error al generar el PDF. Por favor, inténtelo más tarde.'));
-      })
-    );
+  /** API pública: genera y descarga el PDF en el cliente */
+  generate(id: number): Observable<void> {
+    return this.getData(id).pipe(map(data => this.buildPdf(id, data)));
   }
 
-  // Método auxiliar para añadir filas a la tabla
-  private addTableRow(tableBody: any[], header: string, value: string) {
-    tableBody.push([header, value]);
-  }
+  // ----------------- helpers -----------------
 
-  // Método para vista previa (opcional)
-  previewPdf(id: number): Observable<string> {
-    return this.getRegistroData(id).pipe(
-      map(data => {
-        // Mismo código para generar el PDF que en generatePdf
-        const doc = new jsPDF();
-        // ... (código para generar el PDF)
+  private buildPdf(id: number, d: any) {
+    const doc = new jsPDF();
 
-        // En lugar de descargar, devuelve una URL de datos
-        const pdfDataUri = doc.output('datauristring');
-        return pdfDataUri;
-      })
+    /* ---------- Cabecera ---------- */
+    doc.setFontSize(18).setFont('helvetica', 'bold');
+    doc.text('CERTIFICADO DE REPERTORIO',
+             doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
+
+    /* ---------- Tabla ---------- */
+    const body: string[][] = [];
+    const add = (k: string, v?: any) =>
+      v !== undefined && v !== null && v !== '' && body.push([k, String(v)]);
+
+    add('N.º Repertorio:', d.nro);
+    add('Folio:',           d.foj);
+    add('Año:',             d.ano);
+    add('Fecha Escritura:', d.fesc);
+    add('Compareciente 1:', d.nom1);
+    add('RUT 1:', `${d.rut1 ?? ''}${d.rut1d ? '-' + d.rut1d : ''}`);
+    add('Compareciente 2:', d.nom2);
+    add('RUT 2:', `${d.rut2 ?? ''}${d.rut2d ? '-' + d.rut2d : ''}`);
+    add('Tipo Documento:',  d.cont);
+    add('Materia:',         d.materia);
+    add('Requirente:',      d.req);
+    add('Abogado:',         d.abog);
+    add('N.º Boleta:',      d.nBoleta);
+    add('Arancel:',         d.aran);
+    add('Observaciones:',   d.observacion);
+
+    autoTable(doc, {
+      startY: 30,
+      head: [],
+      body,
+      theme: 'grid',
+      styles: { fontSize: 10, cellPadding: 4 },
+      columnStyles: {
+        0: { cellWidth: 60, fontStyle: 'bold', fillColor: [230, 230, 230] },
+        1: { cellWidth: 'auto' }
+      },
+      margin: { left: 20, right: 20 }
+    });
+
+    /* ---------- Pie ---------- */
+    const y = (doc as any).lastAutoTable.finalY + 15;
+    doc.setFontSize(9);
+    doc.text(
+      'Este documento es constancia del registro notarial y no constituye copia autorizada del instrumento.',
+      doc.internal.pageSize.getWidth() / 2,
+      y,
+      { align: 'center', maxWidth: 170 }
     );
+
+    doc.save(`registro_${id}.pdf`);
   }
 }
