@@ -31,7 +31,7 @@
             <input matInput formControlName="materia">
           </mat-form-field>
         </div>
-          <!-- Nuevos botones de exportación -->
+        <!-- Nuevos botones de exportación -->
         <div class="export-actions">
           <button mat-raised-button color="accent" type="button" (click)="exportToExcel()"
             [disabled]="!searchForm.get('ano')?.value">
@@ -98,7 +98,7 @@
               <button mat-icon-button color="accent" [routerLink]="['/registros/editar', r.id]">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button mat-icon-button color="warn" (click)="exportToPdf(r.id); $event.stopPropagation()">
+              <button mat-icon-button color="warn" (click)="exportToPdf(r); $event.stopPropagation()">
                 <mat-icon>picture_as_pdf</mat-icon>
               </button>
             </td>

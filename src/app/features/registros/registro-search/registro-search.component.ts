@@ -111,18 +111,13 @@ export class RegistroSearchComponent {
   exportToExcelFiltered(): void { /* sin cambios */ }
 
   /** Genera el PDF en el cliente */
-  exportToPdf(id: number): void {
+  exportToPdf(row: Registro): void {
     this.loading = true;
-    this.pdf.generate(id).subscribe({
-      next: ()   =>  this.loading = false,           // descarga completada
-      error: err => {
-        this.error   = err.message;
-        this.loading = false;
-        console.error(err);
-      }
+    this.pdf.generateFromRow(row).subscribe({
+      next : ()  => this.loading = false,
+      error: err => { this.error = err.message; this.loading = false; }
     });
   }
-
   /* --------------------  utilidades  -------------------- */
   private downloadFile(blob: Blob, fileName: string): void {
     const url = URL.createObjectURL(blob);
