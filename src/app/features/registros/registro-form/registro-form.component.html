@@ -14,6 +14,28 @@
       <form [formGroup]="registroForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
 
         <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Nombre 1</mat-label>
+            <input matInput formControlName="nom1">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>RUT 1</mat-label>
+            <input matInput formControlName="rut1" placeholder="Ej: 12345678-9">
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Nombre 2</mat-label>
+            <input matInput formControlName="nom2">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>RUT 2</mat-label>
+            <input matInput formControlName="rut2" placeholder="Ej: 12345678-9">
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
           <!-- <mat-form-field appearance="outline">
             <mat-label>Folio</mat-label>
             <input matInput formControlName="folio">
@@ -37,10 +59,10 @@
         </div>
 
         <div class="form-row">
-          <mat-form-field appearance="outline">
+          <!-- <mat-form-field appearance="outline">
             <mat-label>Bimestre</mat-label>
             <input matInput formControlName="bim">
-          </mat-form-field>
+          </mat-form-field> -->
 
           <mat-form-field appearance="outline">
             <mat-label>Materia</mat-label>
@@ -60,29 +82,7 @@
           </mat-form-field>
         </div>
 
-        <div class="form-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Nombre 1</mat-label>
-            <input matInput formControlName="nom1">
-          </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Nombre 2</mat-label>
-            <input matInput formControlName="nom2">
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field appearance="outline">
-            <mat-label>RUT 1</mat-label>
-            <input matInput formControlName="rut1" placeholder="Ej: 12345678-9">
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>RUT 2</mat-label>
-            <input matInput formControlName="rut2" placeholder="Ej: 12345678-9">
-          </mat-form-field>
-        </div>
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Observaciones</mat-label>
