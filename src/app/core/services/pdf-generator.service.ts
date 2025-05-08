@@ -65,10 +65,10 @@ export class PdfGeneratorService {
       fesc: r.fesc,
       nom1: r.nom1,
       nom2: r.nom2,
-      rut1: r.rut1,
-      rut1d: r.rut1d,
-      rut2: r.rut2,
-      rut2d: r.rut2d,
+      // rut1: r.rut1,
+      // rut1d: r.rut1d,
+      // rut2: r.rut2,
+      // rut2d: r.rut2d,
       cont: r.cont,
       materia: r.materia,
       req : r.req,
@@ -101,9 +101,9 @@ export class PdfGeneratorService {
     add('Año:',             d.ano);
     add('Fecha Escritura:', d.fesc);
     add('Compareciente 1:', d.nom1);
-    add('RUT 1:', `${d.rut1 ?? ''}${d.rut1d ? '-' + d.rut1d : ''}`);
+    // add('RUT 1:', `${d.rut1 ?? ''}${d.rut1d ? '-' + d.rut1d : ''}`);
     add('Compareciente 2:', d.nom2);
-    add('RUT 2:', `${d.rut2 ?? ''}${d.rut2d ? '-' + d.rut2d : ''}`);
+    // add('RUT 2:', `${d.rut2 ?? ''}${d.rut2d ? '-' + d.rut2d : ''}`);
     add('Tipo Documento:',  d.cont);
     add('Materia:',         d.materia);
     add('Requirente:',      d.req);
