@@ -46,7 +46,7 @@ export class DebugApiComponent {
       .set('size', '5')
       .set('sort', 'createdAt,desc');
 
-    this.http.get('/api/registros', { params })
+    this.http.get('/api/api/registros', { params })
       .subscribe({
         next: (data) => {
           this.loading = false;
