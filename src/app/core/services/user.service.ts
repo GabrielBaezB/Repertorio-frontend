@@ -108,7 +108,7 @@ export class UserService {
       .set('page', page.toString())
       .set('size', size.toString());
 
-    return this.http.get<any>(`${this.API_URL}/buscar-global`, { params, headers: { 'ngrok-skip-browser-warning': 'true' } }).pipe(
+    return this.http.get<any>(`${this.API_URL}/search`, { params, headers: { 'ngrok-skip-browser-warning': 'true' } }).pipe(
       catchError(error => {
         console.error('Error searching users', error);
         return throwError(() => new Error('Error buscando usuarios'));
