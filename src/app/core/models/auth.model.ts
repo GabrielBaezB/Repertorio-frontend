@@ -4,7 +4,8 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  token: string;
+  accessToken:  string;   // ← muy importante el nombre
+  refreshToken: string | null;
 }
 
 export interface UserInfo {

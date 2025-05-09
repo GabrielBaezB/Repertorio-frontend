@@ -29,7 +29,10 @@
       <div class="error-message" *ngIf="error">{{ error }}</div>
 
       <div class="table-container" *ngIf="!loading && !error">
-        <table mat-table [dataSource]="dataSource" matSort (matSortChange)="onSortChange($event)">
+        <!-- <table mat-table [dataSource]="dataSource" matSort (matSortChange)="onSortChange($event)"> -->
+        <mat-table [dataSource]="dataSource" matSort (matSortChange)="onSortChange($event)" matSortActive="nro"
+          matSortDirection="desc">
+
 
           <ng-container matColumnDef="nom1">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>CONCURRENTE 1</th>
@@ -78,17 +81,17 @@
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
 
-        <mat-paginator
-          [length]="totalItems"
-          [pageSize]="pageSize"
-          [pageIndex]="pageIndex"
-          [pageSizeOptions]="[5, 10, 25, 100]"
-          (page)="onPageChange($event)"
-          aria-label="Seleccionar página de registros">
-        </mat-paginator>
-      </div>
-    </mat-card-content>
-  </mat-card>
-</div>
+          <mat-paginator [length]="totalItems" [pageSize]="pageSize" [pageIndex]="pageIndex"
+            [pageSizeOptions]="[5, 10, 25, 100]" (page)="onPageChange($event)"
+            aria-label="Seleccionar página de registros">
+          </mat-paginator>
+
+
+<mat-card-footer>
+  <div class="footer">
+    <p>© 2023 Repertorio Notarial. Todos los derechos reservados.</p>
+    <p>Desarrollado por <a href="https://www.linkedin.com/in/tu-nombre/" target="_blank">Tu Nombre</a></p>
+  </div>
+</mat-card-footer>
+

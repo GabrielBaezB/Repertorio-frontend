@@ -92,7 +92,7 @@ export class RegistroService {
       .set('size', size.toString())
       .set('sort', sort);
 
-    return this.http.get<any>(`${this.API_URL}/search`, { params, headers: { 'ngrok-skip-browser-warning': 'true' } });
+    return this.http.get<any>(`${this.API_URL}/buscar-global`, { params, headers: { 'ngrok-skip-browser-warning': 'true' } });
   }
 
   exportToExcel(ano: string): Observable<Blob> {

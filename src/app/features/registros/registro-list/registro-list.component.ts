@@ -38,7 +38,7 @@ import { Registro } from '../../../core/models/registro.model';
   styleUrls: ['./registro-list.component.scss']
 })
 export class RegistroListComponent implements OnInit {
-  displayedColumns = ['nom1','nom2','nro','ano','materia','fesc','actions'];
+  displayedColumns = ['nom1', 'nom2', 'nro', 'ano', 'materia', 'fesc', 'actions'];
   dataSource = new MatTableDataSource<Registro>();
 
   filterCtrl = new FormControl('');
@@ -48,7 +48,7 @@ export class RegistroListComponent implements OnInit {
   totalItems = 0;
   pageSize = 10;
   pageIndex = 0;
-  sortField = 'createdAt';
+  sortField = 'nro,desc&sort=ano';
   sortDirection = 'desc';
   loading = true;
   error = '';
@@ -56,7 +56,7 @@ export class RegistroListComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
-  constructor(private registroService: RegistroService) {}
+  constructor(private registroService: RegistroService) { }
 
   ngOnInit(): void {
     this.filterCtrl.valueChanges
@@ -72,31 +72,36 @@ export class RegistroListComponent implements OnInit {
   // }
 
   private onFilterChange(term: string) {
-    this.currentTerm   = term.trim();
-    this.pageIndex     = 0;
-    this.isSearchMode  = this.currentTerm.length > 0;
+    this.currentTerm = term.trim();
+    this.pageIndex = 0;
+    this.isSearchMode = this.currentTerm.length > 0;
     this.loadRegistros();
   }
 
   loadRegistros(): void {
     this.loading = true;
-    const sortParam = `${this.sortField},${this.sortDirection}`;
+    let sortParam = '';
+    if (this.sortField === 'nro') {
+      sortParam = 'nro,desc&sort=ano,desc'; // orden compuesto por nro y ano
+    } else {
+      sortParam = `${this.sortField},${this.sortDirection}`;
+    }
     const obs$ = this.isSearchMode
       ? this.registroService.globalSearch(this.currentTerm, this.pageIndex, this.pageSize, sortParam)
-      : this.registroService.getAll      (this.pageIndex, this.pageSize, sortParam);
+      : this.registroService.getAll(this.pageIndex, this.pageSize, sortParam);
 
-obs$.subscribe({
-  next: data => {
-    const filtrados = (data.content as Registro[]).filter((r: Registro) =>
-      (r.nom1?.trim().length ?? 0) > 0 ||
-      (r.nro?.trim().length  ?? 0) > 0
-    );
-    this.dataSource.data = filtrados;
-    this.totalItems      = data.totalElements;
-    this.loading         = false;
-  },
+    obs$.subscribe({
+      next: data => {
+        const filtrados = (data.content as Registro[]).filter((r: Registro) =>
+          (r.nom1?.trim().length ?? 0) > 0 ||
+          (r.nro?.trim().length ?? 0) > 0
+        );
+        this.dataSource.data = filtrados;
+        this.totalItems = data.totalElements;
+        this.loading = false;
+      },
       error: err => {
-        this.error   = 'Error cargando registros';
+        this.error = 'Error cargando registros';
         console.error(err);
         this.loading = false;
       }
@@ -105,12 +110,12 @@ obs$.subscribe({
 
   onPageChange(event: PageEvent): void {
     this.pageIndex = event.pageIndex;
-    this.pageSize  = event.pageSize;
+    this.pageSize = event.pageSize;
     this.loadRegistros();
   }
 
   onSortChange(sort: Sort): void {
-    this.sortField     = sort.active  || this.sortField;
+    this.sortField = sort.active || this.sortField;
     this.sortDirection = sort.direction || this.sortDirection;
     this.loadRegistros();
   }

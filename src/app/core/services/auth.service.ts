@@ -23,10 +23,12 @@ export class AuthService {
     this.loadUserData();
   }
 
-  login(request: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.API_URL}/login`, request).pipe(
-      tap(response => {
-        this.setToken(response.token);
+  login( dto: LoginRequest): Observable<LoginResponse> {
+    return this.http
+      .post<LoginResponse>(`${this.API_URL}/login`, dto)
+      .pipe(
+        tap(res => {
+        this.setToken(res.accessToken);
         this.loadUserInfo();
       }),
       catchError(error => {
@@ -36,6 +38,18 @@ export class AuthService {
     );
   }
 
+  getToken(): string | null {
+    return localStorage.getItem(this.TOKEN_KEY);
+  }
+
+  private setToken(token: string | null): void {
+    if (token) {
+      localStorage.setItem(this.TOKEN_KEY, token);
+    } else {
+      localStorage.removeItem(this.TOKEN_KEY);
+    }
+  }
+
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY); // También eliminar datos de usuario
@@ -43,16 +57,8 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
-  getToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY);
-  }
-
   isLoggedIn(): boolean {
     return !!this.getToken();
-  }
-
-  private setToken(token: string): void {
-    localStorage.setItem(this.TOKEN_KEY, token);
   }
 
   // Método nuevo para guardar usuario en localStorage
