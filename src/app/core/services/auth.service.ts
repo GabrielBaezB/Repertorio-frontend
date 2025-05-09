@@ -60,6 +60,15 @@ export class AuthService {
   isLoggedIn(): boolean {
     return !!this.getToken();
   }
+  // auth.service.ts
+  refresh(): Observable<void> {
+    return this.http
+      .post<LoginResponse>(`${this.API_URL}/refresh`, {}, { withCredentials: true })
+      .pipe(
+        tap(r => this.setToken(r.accessToken)), // solo aquí tocamos el token
+        map(() => void 0)                       // → “void” al exterior
+      );
+  }
 
   // Método nuevo para guardar usuario en localStorage
   private setUserData(user: UserInfo): void {
