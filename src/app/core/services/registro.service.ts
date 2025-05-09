@@ -90,7 +90,10 @@ export class RegistroService {
       .set('q', q || '')
       .set('page', page.toString())
       .set('size', size.toString())
-      .set('sort', sort);
+      .set('sort', sort)
+      .append('sort', 'nro,desc')
+      .append('sort', 'ano,desc');
+
 
     return this.http.get<any>(`${this.API_URL}/search`, { params, headers: { 'ngrok-skip-browser-warning': 'true' } });
   }
