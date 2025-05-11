@@ -71,7 +71,7 @@ export class DebugApiRolesComponent {
     this.result = null;
 
     // Prueba directamente a Ngrok
-    this.http.get('https://b0f3-186-189-95-84.ngrok-free.app/api/roles', {
+    this.http.get('https://50fa-201-219-233-176.ngrok-free.app/api/roles', {
       headers: {
         'ngrok-skip-browser-warning': 'true',
         'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
@@ -97,7 +97,7 @@ export class DebugApiRolesComponent {
     this.result = null;
 
     // Prueba un rol específico (ID 1)
-    this.http.get('https://b0f3-186-189-95-84.ngrok-free.app/api/roles/1', {
+    this.http.get('https://50fa-201-219-233-176.ngrok-free.app/api/roles/1', {
       headers: {
         'ngrok-skip-browser-warning': 'true',
         'Authorization': `Bearer ${localStorage.getItem('token') || ''}`

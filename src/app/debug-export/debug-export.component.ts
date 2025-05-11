@@ -53,16 +53,13 @@ export class DebugExportComponent {
     this.pdfBlob = null;
 
     // Probar con la URL que funciona en Postman
-    this.testUrl(`https://b0f3-186-189-95-84.ngrok-free.app/api/export/pdf/${this.registroId}`);
+    this.testUrl(`https://50fa-201-219-233-176.ngrok-free.app/api/export/pdf/${this.registroId}`);
   }
 
   testUrl(url: string) {
     console.log(`Probando URL: ${url}`);
 
-    const headers = new HttpHeaders({
-      'ngrok-skip-browser-warning': 'true',
-      'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-    });
+    const headers = new HttpHeaders({ 'ngrok-skip-browser-warning': 'true' });
 
     this.http.get(url, {
       headers,
@@ -82,7 +79,7 @@ export class DebugExportComponent {
 
         // Si este método falla, probar con la siguiente URL
         if (url.includes('/registros/')) {
-          this.testUrl(`https://b0f3-186-189-95-84.ngrok-free.app/api/export/pdf/${this.registroId}`);
+          this.testUrl(`https://50fa-201-219-233-176.ngrok-free.app/api/export/pdf/${this.registroId}`);
         }
       }
     });

@@ -2,9 +2,12 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { environment } from '../../../environments/environment';
+import { AuthService } from '../services/auth.service';
 
 export const apiInterceptor: HttpInterceptorFn = (req, next) => {
-  const token = localStorage.getItem('token');
+
+  const auth = inject(AuthService);
+  const token = auth.getToken();
 
   // Añadir detalles de depuración
   console.log('Interceptando solicitud a:', req.url);

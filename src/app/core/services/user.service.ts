@@ -12,7 +12,7 @@ export class UserService {
   // private readonly API_URL = `${environment.apiUrl}/users`;
 
   private readonly API_URL = environment.production
-  ? 'https://b0f3-186-189-95-84.ngrok-free.app/api/users'  // URL directa
+  ? 'https://50fa-201-219-233-176.ngrok-free.app/api/users'  // URL directa
   : `${environment.apiUrl}/api/users`;  // URL de desarrollo
 
   constructor(private http: HttpClient) {
@@ -28,9 +28,7 @@ export class UserService {
 
       // Añadir encabezados específicos para ngrok
       console.log('Parámetros:', params.toString());
-      const headers = new HttpHeaders({
-        'ngrok-skip-browser-warning': 'true'
-      });
+      const headers = new HttpHeaders({ 'ngrok-skip-browser-warning': 'true' });
 
       console.log('Getting users from:', this.API_URL);
 

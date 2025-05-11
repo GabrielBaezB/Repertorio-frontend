@@ -70,12 +70,9 @@ export class DebugApiComponent {
       .set('size', '5')
       .set('sort', 'createdAt,desc');
 
-    const headers = new HttpHeaders({
-      'ngrok-skip-browser-warning': 'true',
-      'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-    });
+    const headers = new HttpHeaders({ 'ngrok-skip-browser-warning': 'true' });;
 
-    this.http.get('https://b0f3-186-189-95-84.ngrok-free.app/api/registros', { params, headers })
+    this.http.get('https://50fa-201-219-233-176.ngrok-free.app/api/registros', { params, headers })
       .subscribe({
         next: (data) => {
           this.loading = false;
@@ -99,12 +96,9 @@ export class DebugApiComponent {
       .set('page', '0')
       .set('size', '5');
 
-    const headers = new HttpHeaders({
-      'ngrok-skip-browser-warning': 'true',
-      'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-    });
+    const headers = new HttpHeaders({ 'ngrok-skip-browser-warning': 'true' });
 
-    this.http.get('https://b0f3-186-189-95-84.ngrok-free.app/api/registros', { params, headers })
+    this.http.get('https://50fa-201-219-233-176.ngrok-free.app/api/registros', { params, headers })
       .subscribe({
         next: (data) => {
           this.loading = false;

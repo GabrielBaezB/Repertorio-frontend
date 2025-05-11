@@ -11,7 +11,7 @@ export class RegistroService {
   // private readonly API_URL = `${environment.apiUrl}/registros`;
 
   private readonly API_URL = environment.production
-    ? 'https://b0f3-186-189-95-84.ngrok-free.app/api/registros'  // URL directa
+    ? 'https://50fa-201-219-233-176.ngrok-free.app/api/registros'  // URL directa
     : `${environment.apiUrl}/api/registros`;  // URL de desarrollo
 
   constructor(private http: HttpClient) {
@@ -27,9 +27,7 @@ export class RegistroService {
 
     // Añadir encabezados específicos para ngrok
     console.log('Parámetros:', params.toString());
-    const headers = new HttpHeaders({
-      'ngrok-skip-browser-warning': 'true'
-    });
+    const headers = new HttpHeaders({ 'ngrok-skip-browser-warning': 'true' });
     console.log('Realizando solicitud a:', this.API_URL);
     return this.http.get<any>(this.API_URL, { params, headers });
   }
@@ -99,9 +97,7 @@ export class RegistroService {
     // Usar la ruta relativa
     const url = `/api/export/excel/${ano}`;
 
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-    });
+    const headers = new HttpHeaders({ 'ngrok-skip-browser-warning': 'true' });
 
     return this.http.get(url, {
       headers,
@@ -119,10 +115,7 @@ export class RegistroService {
 
     const url = `/api/export/excel-filtrado`;
 
-    const headers = new HttpHeaders({
-      // 'ngrok-skip-browser-warning': 'true',
-      'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-    });
+    const headers = new HttpHeaders({ 'ngrok-skip-browser-warning': 'true' });
 
     return this.http.get(url, {
       headers,
@@ -133,17 +126,13 @@ export class RegistroService {
   // Método para exportar un registro individual a PDF
   exportToPdf(id: number): Observable<Blob> {
     // Usar directamente la URL de Ngrok para respuestas binarias
-    // const url = 'https://b0f3-186-189-95-84.ngrok-free.app/api/export/pdf/' + id;
+    // const url = 'https://50fa-201-219-233-176.ngrok-free.app/api/export/pdf/' + id;
     // const url = `/api/export/pdf/${id}`;
     const url = `/api/export/static-pdf/${id}`;
 
     // console.log('Exportando PDF a través de Netlify:', url);
     console.log('Exportando PDF estático a través de Netlify:', url);
-    const headers = new HttpHeaders({
-      // 'ngrok-skip-browser-warning': 'true',
-      'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-    });
-
+    const headers = new HttpHeaders({ 'ngrok-skip-browser-warning': 'true' });
     return this.http.get(url, {
       headers,
       responseType: 'blob'
@@ -169,9 +158,7 @@ export class RegistroService {
 
     console.log('Exportando PDF dinámico como respaldo:', url);
 
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-    });
+    const headers = new HttpHeaders({ 'ngrok-skip-browser-warning': 'true' });
 
     return this.http.get(url, {
       headers,

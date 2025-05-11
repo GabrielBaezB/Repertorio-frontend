@@ -118,9 +118,7 @@ export class DebugApiUsersComponent {
       .set('page', this.page.toString())
       .set('size', this.size.toString());
 
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-    });
+    const headers = new HttpHeaders({ 'ngrok-skip-browser-warning': 'true' });
 
     const url = '/api/api/users';
     this.logRequestDetails(url, 'GET', headers, params);
@@ -148,12 +146,9 @@ export class DebugApiUsersComponent {
       .set('page', this.page.toString())
       .set('size', this.size.toString());
 
-    const headers = new HttpHeaders({
-      'ngrok-skip-browser-warning': 'true',
-      'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-    });
+    const headers = new HttpHeaders({ 'ngrok-skip-browser-warning': 'true' });
 
-    const url = 'https://b0f3-186-189-95-84.ngrok-free.app/api/users';
+    const url = 'https://50fa-201-219-233-176.ngrok-free.app/api/users';
     this.logRequestDetails(url, 'GET', headers, params);
 
     this.http.get(url, { params, headers })
@@ -175,13 +170,10 @@ export class DebugApiUsersComponent {
   testUsersSingleEndpoint() {
     this.resetState();
 
-    const headers = new HttpHeaders({
-      'ngrok-skip-browser-warning': 'true',
-      'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-    });
+    const headers = new HttpHeaders({ 'ngrok-skip-browser-warning': 'true' });
 
     // Intenta obtener el usuario con ID 1 (asumiendo que existe)
-    const url = 'https://b0f3-186-189-95-84.ngrok-free.app/api/users/1';
+    const url = 'https://50fa-201-219-233-176.ngrok-free.app/api/users/1';
     this.logRequestDetails(url, 'GET', headers, {});
 
     this.http.get(url, { headers })
@@ -203,13 +195,10 @@ export class DebugApiUsersComponent {
   testCustomEndpoint() {
     this.resetState();
 
-    const headers = new HttpHeaders({
-      'ngrok-skip-browser-warning': 'true',
-      'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-    });
+    const headers = new HttpHeaders({ 'ngrok-skip-browser-warning': 'true' });
 
     // URL personalizada usando el path proporcionado por el usuario
-    const url = `https://b0f3-186-189-95-84.ngrok-free.app/api/users/${this.customPath}`;
+    const url = `https://50fa-201-219-233-176.ngrok-free.app/api/users/${this.customPath}`;
     this.logRequestDetails(url, 'GET', headers, {});
 
     this.http.get(url, { headers })

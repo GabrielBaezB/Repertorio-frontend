@@ -14,7 +14,7 @@ export class PdfGeneratorService {
    *  seguir usando el endpoint pdf-data/{id}.
    * ---------------------------------------------------*/
   private readonly BASE = environment.production
-    ? 'https://b0f3-186-189-95-84.ngrok-free.app/api'
+    ? 'https://50fa-201-219-233-176.ngrok-free.app/api'
     : '/api';
 
   constructor(private http: HttpClient) {}
@@ -24,10 +24,7 @@ export class PdfGeneratorService {
    *  /export/pdf-data/{id}.  (No se usa ahora mismo)
    * ====================================================*/
   private getData(id: number) {
-    const headers = new HttpHeaders({
-      'ngrok-skip-browser-warning': 'true',
-      Authorization: `Bearer ${localStorage.getItem('token') ?? ''}`
-    });
+    const headers = new HttpHeaders({ 'ngrok-skip-browser-warning': 'true' });
 
     return this.http.get<any>(`${this.BASE}/export/pdf-data/${id}`, { headers }).pipe(
       catchError(err => {

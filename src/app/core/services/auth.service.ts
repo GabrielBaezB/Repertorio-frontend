@@ -1,217 +1,182 @@
+// src/app/core/services/auth.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpHeaders,
+  HttpErrorResponse,
+} from '@angular/common/http';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, tap, catchError, throwError, of, map } from 'rxjs';
-import { LoginRequest, LoginResponse, UserInfo } from '../models/auth.model';
+import {
+  BehaviorSubject,
+  Observable,
+  tap,
+  catchError,
+  throwError,
+  of,
+  map,
+} from 'rxjs';
+
+import {
+  LoginRequest,
+  LoginResponse,
+  UserInfo,
+} from '../models/auth.model';
 import { environment } from '../../../environments/environment';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
+  /* ───────────────────────────── API base ───────────────────────────── */
   private readonly API_URL = `${environment.apiUrl}/auth`;
-  private readonly TOKEN_KEY = 'auth_token';
-  private readonly USER_KEY = 'current_user'; // Nueva clave para guardar info del usuario
-  private currentUserSubject = new BehaviorSubject<UserInfo | null>(null);
 
+  /* ─────────────────────────── access-token ────────────────────────────
+   * Sólo memoria.  Si PREFIERES que sobreviva a recargas, descomenta la
+   * línea de sessionStorage y comenta la vacía.
+   * -------------------------------------------------------------------*/
+  private accessToken: string | null = null;
+  // private accessToken: string | null =
+  //       sessionStorage.getItem('access_token');
+
+  /* ─────── info del usuario (sí la cacheamos en localStorage) ──────── */
+  private readonly USER_KEY = 'current_user';
+  private currentUserSubject = new BehaviorSubject<UserInfo | null>(null);
   currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(
-    private http: HttpClient,
-    private router: Router
-  ) {
-    this.loadUserData();
+  /* ==================================================================== */
+  constructor(private http: HttpClient, private router: Router) {
+    this.loadUserData();                  // ← intenta poblar currentUser
   }
 
-  login( dto: LoginRequest): Observable<LoginResponse> {
-    return this.http
-      .post<LoginResponse>(`${this.API_URL}/login`, dto)
-      .pipe(
-        tap(res => {
-        this.setToken(res.accessToken);
+  /* ============================ LOGIN ================================ */
+  login(dto: LoginRequest): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.API_URL}/login`, dto).pipe(
+      tap(r => {
+        this.accessToken = r.accessToken;
+        // sessionStorage.setItem('access_token', r.accessToken); // opcional
         this.loadUserInfo();
       }),
-      catchError(error => {
-        console.error('Error en login', error);
-        return throwError(() => new Error('Error de autenticación: ' + (error.error?.message || 'Credenciales inválidas')));
-      })
+      catchError(this.handleAuthError('login'))
     );
   }
 
-  getToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY);
+  /* =========================== REFRESH =============================== */
+  /** Pide un nuevo access-token usando la cookie refresh_token */
+  refresh(): Observable<void> {
+    return this.http
+      .post<LoginResponse>(
+        `${this.API_URL}/refresh`,
+        {},
+        { withCredentials: true }
+      )
+      .pipe(
+        tap(r => (this.accessToken = r.accessToken)),
+        map(() => void 0),
+        catchError(this.handleAuthError('refresh'))
+      );
   }
 
-  private setToken(token: string | null): void {
-    if (token) {
-      localStorage.setItem(this.TOKEN_KEY, token);
-    } else {
-      localStorage.removeItem(this.TOKEN_KEY);
-    }
-  }
-
+  /* =========================== LOGOUT ================================ */
   logout(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
-    localStorage.removeItem(this.USER_KEY); // También eliminar datos de usuario
+    this.accessToken = null;
+    // sessionStorage.removeItem('access_token');
+    localStorage.removeItem(this.USER_KEY);
     this.currentUserSubject.next(null);
     this.router.navigate(['/login']);
   }
 
+  /* ====================== utilidades públicas ======================== */
+  getToken(): string | null {
+    return this.accessToken;
+  }
+
   isLoggedIn(): boolean {
-    return !!this.getToken();
-  }
-  // auth.service.ts
-  refresh(): Observable<void> {
-    return this.http
-      .post<LoginResponse>(`${this.API_URL}/refresh`, {}, { withCredentials: true })
-      .pipe(
-        tap(r => this.setToken(r.accessToken)), // solo aquí tocamos el token
-        map(() => void 0)                       // → “void” al exterior
-      );
+    return !!this.accessToken;
   }
 
-  // Método nuevo para guardar usuario en localStorage
-  private setUserData(user: UserInfo): void {
-    localStorage.setItem(this.USER_KEY, JSON.stringify(user));
-    this.currentUserSubject.next(user);
+  hasRole(role: string): boolean {
+    const user = this.currentUserSubject.value;
+    if (!user) return false;
+
+    return role.startsWith('ROLE_')
+      ? user.roles.includes(role) ||
+          user.roles.includes(role.substring(5))
+      : user.roles.includes(role) ||
+          user.roles.includes(`ROLE_${role}`);
   }
 
-  // Método modificado para cargar del localStorage primero
+  /* ====================== carga de info de usuario =================== */
   private loadUserData(): void {
-    // Primero verificar si hay token
-    const token = this.getToken();
-    if (!token) {
-      return;
-    }
+    /* 1. ¿Tenemos un access-token (en memoria o sessionStorage)? */
+    if (!this.accessToken) return;
 
-    // Intentar cargar usuario desde localStorage
-    const userData = localStorage.getItem(this.USER_KEY);
-    if (userData) {
+    /* 2. Intentar leer de cache */
+    const cached = localStorage.getItem(this.USER_KEY);
+    if (cached) {
       try {
-        const user = JSON.parse(userData) as UserInfo;
-        this.currentUserSubject.next(user);
-      } catch (e) {
-        console.error('Error al parsear datos de usuario', e);
-        // Si hay error, limpiar e intentar cargar desde la API
+        this.currentUserSubject.next(JSON.parse(cached));
+      } catch {
         localStorage.removeItem(this.USER_KEY);
       }
     }
 
-    // De cualquier manera, intentar refrescar datos del usuario desde la API
+    /* 3. Refrescar desde backend */
     this.loadUserInfo();
   }
 
   private loadUserInfo(): void {
-    const token = this.getToken();
-    if (!this.getToken()) {
-      return;
-    }
+    if (!this.accessToken) return;
 
-    console.log('Intentando cargar información del usuario desde API');
-
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'ngrok-skip-browser-warning': 'true'
-    });
-
+    const headers = new HttpHeaders({ 'ngrok-skip-browser-warning': 'true' });
     this.http.get<UserInfo>(`${this.API_URL}/me`, { headers }).pipe(
-      tap(user => {
-        console.log('Información del usuario cargada correctamente:', user);
-        console.log('Roles del usuario:', user.roles);
-        this.setUserData(user);
+      tap(u => {
+        localStorage.setItem(this.USER_KEY, JSON.stringify(u));
+        this.currentUserSubject.next(u);
       }),
-      catchError(error => {
-        console.error('Error cargando información del usuario:', error);
-        console.error('Código de estado:', error.status);
-        console.error('Mensaje:', error.message);
-        console.error('Respuesta del servidor:', error.error);
-
-        // Importante: No cerrar sesión automáticamente para errores no críticos
-        if (error.status === 401) {
-          console.log('Error de autenticación, cerrando sesión');
-          this.logout();
-        } else {
-          // Para otros errores, intentar usar datos del localStorage si existen
-          const userData = localStorage.getItem(this.USER_KEY);
-          if (userData) {
-            console.log('Usando datos de usuario en caché debido al error');
-            try {
-              const user = JSON.parse(userData) as UserInfo;
-              this.currentUserSubject.next(user);
-            } catch (e) {
-              console.error('Error al parsear datos en caché', e);
-            }
-          }
-        }
-
-        return throwError(() => new Error('No se pudo cargar información del usuario: ' + error.message));
-      })
-    ).subscribe({
-      // Añadir manejadores de error adicionales
-      error: (err) => console.error('Error en la suscripción a loadUserInfo:', err)
-    });
+      catchError(err => this.handleUserInfoError(err))
+    ).subscribe();          // ← no olvidar suscribir
   }
 
-  // Método para validar el token manualmente (útil para guards)
+  /* =========================== VALIDACIÓN ============================ */
   validateToken(): Observable<boolean> {
-    console.log('Validando token con el servidor...');
-    const token = this.getToken();
-    if (!this.getToken()) {
-      console.log('No hay token disponible, retornando false');
-      return of(false);
-    }
+    if (!this.accessToken) return of(false);
 
-    console.log('Validando token...');
-
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'ngrok-skip-browser-warning': 'true'
-    });
-
+    const headers = new HttpHeaders({ 'ngrok-skip-browser-warning': 'true' });
 
     return this.http.get<UserInfo>(`${this.API_URL}/me`, { headers }).pipe(
-      tap(user => {
-        console.log('Token válido, información de usuario:', user);
-        console.log('Roles del usuario:', user.roles);
-        this.setUserData(user);
+      tap(u => {
+        localStorage.setItem(this.USER_KEY, JSON.stringify(u));
+        this.currentUserSubject.next(u);
       }),
       map(() => true),
-      catchError(error => {
-        console.error('Error validando token:', error);
-
-        // Si es un error de autenticación, cerrar sesión
-        if (error.status === 401 || error.status === 403) {
-          console.log('Token inválido, cerrando sesión');
+      catchError(err => {
+        if (err.status === 401 || err.status === 403) {
           this.logout();
           return of(false);
         }
-
-        // Para otros tipos de errores (ej. conectividad), usar datos en caché si existen
-        const userData = localStorage.getItem(this.USER_KEY);
-        if (userData) {
-          try {
-            console.log('Usando datos en caché para la validación');
-            return of(true);
-          } catch (e) {
-            console.error('Error con los datos en caché', e);
-          }
-        }
-
-        // Si no hay datos en caché, retornar false
-        return of(false);
+        /* si falla por conectividad, usar cache si existe */
+        return localStorage.getItem(this.USER_KEY) ? of(true) : of(false);
       })
     );
   }
-  hasRole(role: string): boolean {
-    const user = this.currentUserSubject.getValue();
-    if (!user) return false;
 
-    if (role.startsWith('ROLE_')) {
-      return user.roles.includes(role) || user.roles.includes(role.substring(5));
-    } else {
-      return user.roles.includes(role) || user.roles.includes(`ROLE_${role}`);
-    }
+  /* ============================== Helpers ============================ */
+  private handleAuthError(op: string) {
+    return (err: HttpErrorResponse) =>
+      throwError(
+        () =>
+          new Error(
+            `Error en ${op}: ${err.error?.message || err.message || 'desconocido'}`
+          )
+      );
+  }
+
+  private handleUserInfoError(err: HttpErrorResponse): Observable<never> {
+    if (err.status === 401) this.logout();
+    return throwError(
+      () =>
+        new Error(
+          'No se pudo cargar información del usuario: ' +
+            (err.error?.message || err.message)
+        )
+    );
   }
 }

@@ -12,7 +12,7 @@ export class RoleService {
   // private readonly API_URL = `${environment.apiUrl}/roles`;
 
   private readonly API_URL = environment.production
-    ? 'https://b0f3-186-189-95-84.ngrok-free.app/api/roles'  // URL directa
+    ? 'https://50fa-201-219-233-176.ngrok-free.app/api/roles'  // URL directa
     : `${environment.apiUrl}/api/roles`;
      // URL de desarrollo
   constructor(private http: HttpClient) {
@@ -21,9 +21,7 @@ export class RoleService {
 
   getAll(): Observable<Role[]> {
 
-    const headers = new HttpHeaders({
-      'ngrok-skip-browser-warning': 'true'
-    });
+    const headers = new HttpHeaders({ 'ngrok-skip-browser-warning': 'true' });
 
     console.log('Solicitando todos los roles desde:', this.API_URL);
 
