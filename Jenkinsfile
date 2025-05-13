@@ -44,7 +44,7 @@ pipeline {
                 }
                 stage('Security Scan') {
                     steps {
-                        sh 'npm audit --json --audit-level=high || true'
+                        sh 'npm audit --json --audit-level=high'
                     }
                 }
             }
