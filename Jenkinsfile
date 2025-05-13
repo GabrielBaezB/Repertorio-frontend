@@ -2,11 +2,10 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'node-18.20.7' // Asegúrate de que este nombre coincida con tu configuración en Jenkins
+        nodejs 'node-18.20.7'
     }
 
     environment {
-        // Variables de entorno
         CHROME_BIN = '/usr/bin/google-chrome'
         NG_CLI_ANALYTICS = 'false'
     }
@@ -14,32 +13,28 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Checkout del código fuente
                 checkout scm
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                sh 'npm ci' // Usa npm ci en lugar de npm install para instalación determinista
+                sh 'npm ci'
             }
         }
 
         stage('Lint') {
             steps {
-                // Asume que tienes configurado eslint o alguna regla de linting
-                sh 'npx ng lint || true' // El || true evita que falle el pipeline si no hay comando lint
+                sh 'npx ng lint || true'
             }
         }
 
         // stage('Test') {
         //     steps {
-        //         // Ejecuta tests unitarios con cobertura
         //         sh 'npx ng test --browsers=ChromeHeadless --watch=false --code-coverage || true'
         //     }
         //     post {
         //         always {
-        //             // Publica reportes de cobertura si se generan
         //             publishHTML(target: [
         //                 allowMissing: true,
         //                 alwaysLinkToLastBuild: false,
@@ -58,22 +53,30 @@ pipeline {
             }
             steps {
                 sh 'npx ng build --configuration=development'
+                // Para debug: mostrar dónde están los archivos compilados
+                sh 'find . -type d -name "dist" -o -name "browser" | sort'
             }
         }
 
         stage('Build for Production') {
             when {
-                branch 'main'
+                expression {
+                    return env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'master'
+                }
             }
             steps {
                 sh 'npx ng build --configuration=production'
+                // Para debug: mostrar dónde están los archivos compilados
+                sh 'find . -type d -name "dist" -o -name "browser" | sort'
             }
         }
 
         stage('Archive Artifacts') {
             steps {
-                // Angular 19 genera la salida en dist/front/browser para el proyecto "front"
-                archiveArtifacts artifacts: 'dist/**/*', fingerprint: true
+                // Usar patrón más genérico para encontrar los archivos compilados
+                archiveArtifacts artifacts: '**/*.js, **/*.css, **/*.html, **/*.ico, **/*.png, **/*.svg',
+                                 excludes: 'node_modules/**, .git/**',
+                                 fingerprint: true
             }
         }
 
@@ -83,26 +86,25 @@ pipeline {
             }
             steps {
                 echo 'Deploying to Development environment...'
-                // Añadir comandos de despliegue a ambiente de desarrollo
-                // Por ejemplo: sh 'rsync -avz dist/front/browser/ user@server:/path/to/dev/web/root/'
+                // Comandos de despliegue a ambiente de desarrollo
             }
         }
 
         stage('Deploy to Production') {
             when {
-                branch 'main'
+                expression {
+                    return env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'master'
+                }
             }
             steps {
                 echo 'Deploying to Production environment...'
-                // Añadir comandos de despliegue a producción
-                // Por ejemplo: sh 'rsync -avz dist/front/browser/ user@server:/path/to/prod/web/root/'
+                // Comandos de despliegue a producción
             }
         }
     }
 
     post {
         always {
-            // Reemplazado cleanWs() por deleteDir() que está disponible en Jenkins core
             deleteDir()
         }
         success {
