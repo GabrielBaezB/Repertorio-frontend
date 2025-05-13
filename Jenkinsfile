@@ -8,18 +8,15 @@ pipeline {
     environment {
         CHROME_BIN = '/usr/bin/google-chrome'
         NG_CLI_ANALYTICS = 'false'
-        SONAR_SCANNER_HOME = tool 'repertorioQubeScanner'
+        SONAR_SCANNER_HOME = tool 'repertorio'
         SONAR_PROJECT_KEY = 'repertorio-qube-key'
-        SONAR_PROJECT_NAME = 'Repertorio'
-        DOCKER_HUB_CREDS = credentials('dockerhub-credentials')
+        SONAR_PROJECT_NAME = 'repertorio'
     }
 
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
-                // Cache node_modules para builds futuros
-                cache(path: './node_modules', key: "${env.JOB_NAME}-${hashFiles('**/package-lock.json')}")
             }
         }
 
@@ -32,28 +29,8 @@ pipeline {
         stage('Lint') {
             steps {
                 sh 'npx ng lint || true'
-                recordIssues(tools: [esLint(pattern: 'eslint-report.json')])
             }
         }
-
-        // stage('Test') {
-        //     steps {
-        //         sh 'npx ng test --browsers=ChromeHeadless --watch=false --code-coverage || true'
-        //     }
-        //     post {
-        //         always {
-        //             publishHTML(target: [
-        //                 allowMissing: true,
-        //                 alwaysLinkToLastBuild: false,
-        //                 keepAll: true,
-        //                 reportDir: 'coverage/front',
-        //                 reportFiles: 'index.html',
-        //                 reportName: 'Coverage Report'
-        //             ])
-        //         }
-        //     }
-        // }
-
         stage('Static Code Analysis with SonarQube') {
             steps {
                 withSonarQubeEnv('SonarQube') {
@@ -91,6 +68,8 @@ pipeline {
             }
             steps {
                 sh 'npx ng build --configuration=development'
+                // Para debug: mostrar dónde están los archivos compilados
+                sh 'find . -type d -name "dist" -o -name "browser" | sort'
             }
         }
 
@@ -102,6 +81,17 @@ pipeline {
             }
             steps {
                 sh 'npx ng build --configuration=production'
+                // Para debug: mostrar dónde están los archivos compilados
+                sh 'find . -type d -name "dist" -o -name "browser" | sort'
+            }
+        }
+
+        stage('Archive Artifacts') {
+            steps {
+                // Usar patrón más genérico para encontrar los archivos compilados
+                archiveArtifacts artifacts: '**/*.js, **/*.css, **/*.html, **/*.ico, **/*.png, **/*.svg',
+                                 excludes: 'node_modules/**, .git/**',
+                                 fingerprint: true
             }
         }
 
@@ -111,8 +101,7 @@ pipeline {
             }
             steps {
                 echo 'Deploying to Development environment...'
-                // Ejemplo para despliegue con Docker
-                // sh "ssh user@dev-server 'docker pull username/${SONAR_PROJECT_KEY}:dev-${env.BUILD_NUMBER} && docker-compose up -d'"
+                // Comandos de despliegue a ambiente de desarrollo
             }
         }
 
@@ -123,28 +112,21 @@ pipeline {
                 }
             }
             steps {
-                // Requiere aprobación manual para desplegar a producción
-                input message: '¿Desplegar a producción?', ok: 'Sí'
                 echo 'Deploying to Production environment...'
-                // Ejemplo para despliegue con Docker
-                // sh "ssh user@prod-server 'docker pull username/${SONAR_PROJECT_KEY}:prod-${env.BUILD_NUMBER} && docker-compose up -d'"
+                // Comandos de despliegue a producción
             }
         }
     }
 
     post {
         always {
-            // Limpieza
-            sh 'docker rmi $(docker images -q -f dangling=true) || true'
             deleteDir()
         }
         success {
             echo 'Pipeline executed successfully!'
-            slackSend(color: 'good', message: "ÉXITO: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
         }
         failure {
             echo 'Pipeline execution failed!'
-            slackSend(color: 'danger', message: "FALLO: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
         }
     }
 }
