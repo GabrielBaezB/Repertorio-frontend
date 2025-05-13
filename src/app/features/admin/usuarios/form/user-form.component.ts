@@ -12,7 +12,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'; // Importar este módulo
-import { User } from '../../../../core/models/user.model';
 import { Role } from '../../../../core/models/role.model';
 import { UserService } from '../../../../core/services/user.service';
 import { RoleService } from '../../../../core/services/role.service';
