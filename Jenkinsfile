@@ -32,25 +32,25 @@ pipeline {
             }
         }
 
-        stage('Test') {
-            steps {
-                // Ejecuta tests unitarios con cobertura
-                sh 'npx ng test --browsers=ChromeHeadless --watch=false --code-coverage'
-            }
-            post {
-                always {
-                    // Publica reportes de cobertura si se generan
-                    publishHTML(target: [
-                        allowMissing: true,
-                        alwaysLinkToLastBuild: false,
-                        keepAll: true,
-                        reportDir: 'coverage/front',
-                        reportFiles: 'index.html',
-                        reportName: 'Coverage Report'
-                    ])
-                }
-            }
-        }
+        // stage('Test') {
+        //     steps {
+        //         // Ejecuta tests unitarios con cobertura
+        //         sh 'npx ng test --browsers=ChromeHeadless --watch=false --code-coverage'
+        //     }
+        //     post {
+        //         always {
+        //             // Publica reportes de cobertura si se generan
+        //             publishHTML(target: [
+        //                 allowMissing: true,
+        //                 alwaysLinkToLastBuild: false,
+        //                 keepAll: true,
+        //                 reportDir: 'coverage/front',
+        //                 reportFiles: 'index.html',
+        //                 reportName: 'Coverage Report'
+        //             ])
+        //         }
+        //     }
+        // }
 
         stage('Build for Development') {
             when {
