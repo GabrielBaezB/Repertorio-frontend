@@ -1,7 +1,8 @@
 // src/app/debug-api-roles/debug-api-roles.component.ts
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { DebugService } from '../core/services/debug.service';
+import { DebugBaseComponent } from '../shared/components/debug-base/debug-base.component';
 
 @Component({
   selector: 'app-debug-api-roles',
@@ -17,102 +18,84 @@ import { HttpClient } from '@angular/common/http';
         <button (click)="testSingleRole()">Test Single Role</button>
       </div>
 
-      <div *ngIf="loading">Loading...</div>
-
-      <div *ngIf="error" style="color: red; margin-top: 15px;">
-        <p><strong>Error:</strong> {{ error }}</p>
-        <pre *ngIf="errorDetails">{{ errorDetails | json }}</pre>
+      <div *ngIf="loading" style="margin-top: 15px; color: blue;">
+        <p>Loading... Please wait...</p>
       </div>
 
-      <div *ngIf="result" style="margin-top: 15px;">
-        <pre>{{ result | json }}</pre>
+      <div *ngIf="error" style="margin-top: 15px; color: red; border: 1px solid #ffcccc; padding: 10px; background-color: #fff5f5;">
+        <h3>Error</h3>
+        <p><strong>Status:</strong> {{ errorStatus }}</p>
+        <p><strong>Message:</strong> {{ error }}</p>
+        <div *ngIf="errorDetails">
+          <h4>Error Details:</h4>
+          <pre style="white-space: pre-wrap; background-color: #f8f8f8; padding: 10px; border-radius: 4px;">{{ errorDetails | json }}</pre>
+        </div>
+      </div>
+
+      <div *ngIf="result" style="margin-top: 15px; border: 1px solid #ccffcc; padding: 10px; background-color: #f5fff5;">
+        <h3>Result</h3>
+        <pre style="white-space: pre-wrap; background-color: #f8f8f8; padding: 10px; border-radius: 4px; max-height: 400px; overflow: auto;">{{ result | json }}</pre>
+      </div>
+
+      <div *ngIf="requestDetails" style="margin-top: 15px; border: 1px solid #e0e0e0; padding: 10px; background-color: #f9f9f9;">
+        <h3>Request Details</h3>
+        <p><strong>URL:</strong> {{ requestDetails.url }}</p>
+        <p><strong>Method:</strong> {{ requestDetails.method }}</p>
+        <p><strong>Headers:</strong></p>
+        <pre style="white-space: pre-wrap; background-color: #f8f8f8; padding: 10px; border-radius: 4px;">{{ requestDetails.headers | json }}</pre>
+        <p><strong>Params:</strong></p>
+        <pre style="white-space: pre-wrap; background-color: #f8f8f8; padding: 10px; border-radius: 4px;">{{ requestDetails.params | json }}</pre>
       </div>
     </div>
   `
 })
-export class DebugApiRolesComponent {
-  loading = false;
-  error: string | null = null;
-  errorDetails: any = null;
-  result: any = null;
-
-  constructor(private http: HttpClient) {}
+export class DebugApiRolesComponent extends DebugBaseComponent {
+  constructor(protected override debugService: DebugService) {
+    super(debugService);
+  }
 
   testWithNetlify() {
-    this.loading = true;
-    this.error = null;
-    this.errorDetails = null;
-    this.result = null;
+    this.resetState();
+    const endpoint = 'api/roles';
+    const url = `/api/${endpoint}`;
+    const headers = this.debugService.getHeaders(true); // Con autenticación
 
-    // Prueba usando la URL de Netlify con redirección
-    this.http.get('/api/api/roles', {
-      headers: {
-        'ngrok-skip-browser-warning': 'true',
-        'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-      }
-    }).subscribe({
-      next: (data) => {
-        this.loading = false;
-        this.result = data;
-      },
-      error: (err) => {
-        this.loading = false;
-        this.error = `Status: ${err.status}. Message: ${err.message}`;
-        this.errorDetails = err.error;
-        console.error('Full error:', err);
-      }
-    });
+    this.logRequestDetails(url, 'GET', headers, {});
+
+    this.debugService.get(endpoint, undefined, true) // Con autenticación
+      .subscribe({
+        next: (data) => this.handleSuccess(data),
+        error: (err) => this.handleError(err)
+      });
   }
 
   testDirectNgrok() {
-    this.loading = true;
-    this.error = null;
-    this.errorDetails = null;
-    this.result = null;
+    this.resetState();
+    const endpoint = 'roles';
+    const url = this.debugService.getApiUrl(endpoint);
+    const headers = this.debugService.getHeaders(true); // Con autenticación
 
-    // Prueba directamente a Ngrok
-    this.http.get('https://50fa-201-219-233-176.ngrok-free.app/api/roles', {
-      headers: {
-        'ngrok-skip-browser-warning': 'true',
-        'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-      }
-    }).subscribe({
-      next: (data) => {
-        this.loading = false;
-        this.result = data;
-      },
-      error: (err) => {
-        this.loading = false;
-        this.error = `Status: ${err.status}. Message: ${err.message}`;
-        this.errorDetails = err.error;
-        console.error('Full error:', err);
-      }
-    });
+    this.logRequestDetails(url, 'GET', headers, {});
+
+    this.debugService.get(endpoint, undefined, true) // Con autenticación
+      .subscribe({
+        next: (data) => this.handleSuccess(data),
+        error: (err) => this.handleError(err)
+      });
   }
 
   testSingleRole() {
-    this.loading = true;
-    this.error = null;
-    this.errorDetails = null;
-    this.result = null;
+    this.resetState();
+    const endpoint = 'roles/1';
+    const url = this.debugService.getApiUrl(endpoint);
+    const headers = this.debugService.getHeaders(true); // Con autenticación
 
-    // Prueba un rol específico (ID 1)
-    this.http.get('https://50fa-201-219-233-176.ngrok-free.app/api/roles/1', {
-      headers: {
-        'ngrok-skip-browser-warning': 'true',
-        'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-      }
-    }).subscribe({
-      next: (data) => {
-        this.loading = false;
-        this.result = data;
-      },
-      error: (err) => {
-        this.loading = false;
-        this.error = `Status: ${err.status}. Message: ${err.message}`;
-        this.errorDetails = err.error;
-        console.error('Full error:', err);
-      }
-    });
+    this.logRequestDetails(url, 'GET', headers, {});
+
+    this.debugService.get(endpoint, undefined, true) // Con autenticación
+      .subscribe({
+        next: (data) => this.handleSuccess(data),
+        error: (err) => this.handleError(err)
+      });
   }
 }

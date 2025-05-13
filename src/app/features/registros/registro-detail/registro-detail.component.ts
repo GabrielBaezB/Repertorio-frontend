@@ -8,13 +8,11 @@ import { MatDividerModule } from '@angular/material/divider';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { RegistroService } from '../../../core/services/registro.service';
 import { Registro } from '../../../core/models/registro.model';
-import { SafePipe } from '../../../shared/pipes/safe.pipe';
 
 @Component({
   selector: 'app-registro-detail',
   standalone: true,
   imports: [
-    SafePipe,
     CommonModule,
     MatCardModule,
     MatButtonModule,

@@ -88,5 +88,11 @@ export const routes: Routes = [
   {
     path: '**',
     redirectTo: '/dashboard'
+  },
+  {
+    path: 'debug',
+    loadChildren: () => import('./debug/debug.module').then(m => m.DebugModule),
+    canActivate: [authGuard, adminGuard], // Opcional: proteger con autenticación
+    data: { roles: ['ADMIN'] } // Opcional: restringir a roles específicos
   }
 ];

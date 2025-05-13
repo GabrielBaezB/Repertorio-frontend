@@ -1,11 +1,13 @@
-// src/app/debug-api-users/debug-api-users.component.ts
+// src/app/debug-api-user/debug-api-user.component.ts
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { HttpParams } from '@angular/common/http';
+import { DebugService } from '../core/services/debug.service';
+import { DebugBaseComponent } from '../shared/components/debug-base/debug-base.component';
 
 @Component({
-  selector: 'app-debug-api-users',
+  selector: 'app-debug-api-user',
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
@@ -77,143 +79,79 @@ import { FormsModule } from '@angular/forms';
     </div>
   `
 })
-export class DebugApiUsersComponent {
-  loading = false;
-  error: string | null = null;
-  errorStatus: number | null = null;
-  errorDetails: any = null;
-  result: any = null;
-  requestDetails: any = null;
+export class DebugApiUserComponent extends DebugBaseComponent {
+  customPath: string = '';
 
-  page = 0;
-  size = 10;
-  customPath = 'test'; // Valor predeterminado para pruebas personalizadas
-  showAdvanced = false;
-
-  constructor(private http: HttpClient) {}
-
-  private resetState() {
-    this.loading = true;
-    this.error = null;
-    this.errorStatus = null;
-    this.errorDetails = null;
-    this.result = null;
-    this.requestDetails = null;
-  }
-
-  private logRequestDetails(url: string, method: string, headers: any, params: any) {
-    this.requestDetails = {
-      url,
-      method,
-      headers,
-      params
-    };
-    console.log('Request details:', this.requestDetails);
+  constructor(protected override debugService: DebugService) {
+    super(debugService);
   }
 
   testUsersWithNetlify() {
     this.resetState();
+    const params = this.createPaginationParams(this.page, this.size);
+    const endpoint = 'api/users';
 
-    const params = new HttpParams()
-      .set('page', this.page.toString())
-      .set('size', this.size.toString());
+    this.logRequestDetails(`/api/${endpoint}`, 'GET', this.debugService.getHeaders(true), params);
 
-    const headers = new HttpHeaders({ 'ngrok-skip-browser-warning': 'true' });
-
-    const url = '/api/api/users';
-    this.logRequestDetails(url, 'GET', headers, params);
-
-    this.http.get(url, { params, headers })
+    this.debugService.get(endpoint, params, true)
       .subscribe({
-        next: (data) => {
-          this.loading = false;
-          this.result = data;
-        },
-        error: (err) => {
-          this.loading = false;
-          this.errorStatus = err.status;
-          this.error = err.message;
-          this.errorDetails = err.error;
-          console.error('Full error:', err);
-        }
+        next: (data) => this.handleSuccess(data),
+        error: (err) => this.handleError(err)
       });
   }
 
   testUsersDirectNgrok() {
     this.resetState();
+    const params = this.createPaginationParams(this.page, this.size);
+    const endpoint = 'users';
 
-    const params = new HttpParams()
-      .set('page', this.page.toString())
-      .set('size', this.size.toString());
+    const url = this.debugService.getApiUrl(endpoint);
+    const headers = this.debugService.getHeaders(true);
 
-    const headers = new HttpHeaders({ 'ngrok-skip-browser-warning': 'true' });
-
-    const url = 'https://50fa-201-219-233-176.ngrok-free.app/api/users';
     this.logRequestDetails(url, 'GET', headers, params);
 
-    this.http.get(url, { params, headers })
+    this.debugService.get(endpoint, params, true)
       .subscribe({
-        next: (data) => {
-          this.loading = false;
-          this.result = data;
-        },
-        error: (err) => {
-          this.loading = false;
-          this.errorStatus = err.status;
-          this.error = err.message;
-          this.errorDetails = err.error;
-          console.error('Full error:', err);
-        }
+        next: (data) => this.handleSuccess(data),
+        error: (err) => this.handleError(err)
       });
   }
 
   testUsersSingleEndpoint() {
     this.resetState();
+    const endpoint = 'users/1';
 
-    const headers = new HttpHeaders({ 'ngrok-skip-browser-warning': 'true' });
+    const url = this.debugService.getApiUrl(endpoint);
+    const headers = this.debugService.getHeaders(true);
 
-    // Intenta obtener el usuario con ID 1 (asumiendo que existe)
-    const url = 'https://50fa-201-219-233-176.ngrok-free.app/api/users/1';
     this.logRequestDetails(url, 'GET', headers, {});
 
-    this.http.get(url, { headers })
+    this.debugService.get(endpoint, undefined, true)
       .subscribe({
-        next: (data) => {
-          this.loading = false;
-          this.result = data;
-        },
-        error: (err) => {
-          this.loading = false;
-          this.errorStatus = err.status;
-          this.error = err.message;
-          this.errorDetails = err.error;
-          console.error('Full error:', err);
-        }
+        next: (data) => this.handleSuccess(data),
+        error: (err) => this.handleError(err)
       });
   }
 
   testCustomEndpoint() {
+    if (!this.customPath) {
+      this.error = 'Por favor, ingrese una ruta personalizada';
+      return;
+    }
+
     this.resetState();
+    const endpoint = this.customPath.startsWith('/') ? this.customPath.substring(1) : this.customPath;
+    const params = this.createPaginationParams(this.page, this.size);
 
-    const headers = new HttpHeaders({ 'ngrok-skip-browser-warning': 'true' });
+    const url = this.debugService.getApiUrl(endpoint);
+    const headers = this.debugService.getHeaders(true);
 
-    // URL personalizada usando el path proporcionado por el usuario
-    const url = `https://50fa-201-219-233-176.ngrok-free.app/api/users/${this.customPath}`;
-    this.logRequestDetails(url, 'GET', headers, {});
+    this.logRequestDetails(url, 'GET', headers, params);
 
-    this.http.get(url, { headers })
+    this.debugService.get(endpoint, params, true)
       .subscribe({
-        next: (data) => {
-          this.loading = false;
-          this.result = data;
-        },
-        error: (err) => {
-          this.loading = false;
-          this.errorStatus = err.status;
-          this.error = err.message;
-          this.errorDetails = err.error;
-          console.error('Full error:', err);
-        }
+        next: (data) => this.handleSuccess(data),
+        error: (err) => this.handleError(err)
       });
   }
 }
