@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'node-18.20.7' // Necesitas configurar esta herramienta en Jenkins
+        nodejs 'node-18.20.7' // Asegúrate de que este nombre coincida con tu configuración en Jenkins
     }
 
     environment {
@@ -35,7 +35,7 @@ pipeline {
         // stage('Test') {
         //     steps {
         //         // Ejecuta tests unitarios con cobertura
-        //         sh 'npx ng test --browsers=ChromeHeadless --watch=false --code-coverage'
+        //         sh 'npx ng test --browsers=ChromeHeadless --watch=false --code-coverage || true'
         //     }
         //     post {
         //         always {
@@ -72,8 +72,8 @@ pipeline {
 
         stage('Archive Artifacts') {
             steps {
-                // Guarda los artefactos compilados
-                archiveArtifacts artifacts: 'dist/front/browser/**', fingerprint: true
+                // Angular 19 genera la salida en dist/front/browser para el proyecto "front"
+                archiveArtifacts artifacts: 'dist/**/*', fingerprint: true
             }
         }
 
@@ -84,7 +84,7 @@ pipeline {
             steps {
                 echo 'Deploying to Development environment...'
                 // Añadir comandos de despliegue a ambiente de desarrollo
-                // Por ejemplo: sh 'rsync -avz dist/ user@server:/path/to/dev/web/root/'
+                // Por ejemplo: sh 'rsync -avz dist/front/browser/ user@server:/path/to/dev/web/root/'
             }
         }
 
@@ -95,15 +95,15 @@ pipeline {
             steps {
                 echo 'Deploying to Production environment...'
                 // Añadir comandos de despliegue a producción
-                // Por ejemplo: sh 'rsync -avz dist/ user@server:/path/to/prod/web/root/'
+                // Por ejemplo: sh 'rsync -avz dist/front/browser/ user@server:/path/to/prod/web/root/'
             }
         }
     }
 
     post {
         always {
-            // Limpieza del workspace
-            cleanWs()
+            // Reemplazado cleanWs() por deleteDir() que está disponible en Jenkins core
+            deleteDir()
         }
         success {
             echo 'Pipeline executed successfully!'
