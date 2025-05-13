@@ -40,8 +40,6 @@ pipeline {
                         -Dsonar.projectName='${SONAR_PROJECT_NAME}' \
                         -Dsonar.projectVersion=${env.BUILD_NUMBER} \
                         -Dsonar.sources=src \
-                        -Dsonar.typescript.lcov.reportPaths=coverage/front/lcov.info \
-                        -Dsonar.javascript.lcov.reportPaths=coverage/front/lcov.info \
                         -Dsonar.verbose=true \
                     """
                 }
