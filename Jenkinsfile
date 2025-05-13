@@ -8,7 +8,7 @@ pipeline {
     environment {
         CHROME_BIN = '/usr/bin/google-chrome'
         NG_CLI_ANALYTICS = 'false'
-        SONAR_SCANNER_HOME = tool 'repertorio'
+        SONAR_SCANNER_HOME = tool 'repertorioQubeScanner'
         SONAR_PROJECT_KEY = 'repertorio-qube-key'
         SONAR_PROJECT_NAME = 'repertorio'
     }
