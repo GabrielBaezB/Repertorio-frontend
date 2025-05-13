@@ -73,7 +73,7 @@ pipeline {
         stage('Archive Artifacts') {
             steps {
                 // Guarda los artefactos compilados
-                archiveArtifacts artifacts: 'dist/**', fingerprint: true
+                archiveArtifacts artifacts: 'dist/front/browser/**', fingerprint: true
             }
         }
 
