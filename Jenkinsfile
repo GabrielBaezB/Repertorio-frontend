@@ -34,7 +34,6 @@ pipeline {
                         cp -R .npm_cache/node_modules ./
                     fi
                 '''
-
                 // Instalar dependencias
                 sh 'npm ci'
 
@@ -71,6 +70,9 @@ pipeline {
 
         stage('Static Analysis (SonarQube)') {
             steps {
+
+                sh 'npx ng lint --format json > eslint-report.json || true'
+
                 withSonarQubeEnv('SonarQube') {
                     sh """
                         ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
