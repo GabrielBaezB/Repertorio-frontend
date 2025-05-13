@@ -1,0 +1,31 @@
+/* Global styles specific to the AppComponent */
+:host {
+  display: block;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+:host ::ng-deep {
+  /* Styles for child components if needed */
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.header {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.footer {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  text-align: center;
+  border-top: 1px solid #ddd;
+}
