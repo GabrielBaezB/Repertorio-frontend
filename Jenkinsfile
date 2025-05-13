@@ -27,9 +27,7 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                cache(maxCacheSize: 2, caches:[
-                    cacheEntry(path: './node_modules', key: 'node-modules', fallbackKey: 'node-modules')
-                ]) {
+                jobcacher(name: 'node-modules', paths: ['node_modules']) {
                     sh 'npm ci'
                 }
             }
