@@ -30,6 +30,7 @@
 
       <div class="table-container" *ngIf="!loading && !error">
         <table mat-table [dataSource]="dataSource" matSort (matSortChange)="onSortChange($event)">
+           <caption>Listado del registro</caption>
 
           <ng-container matColumnDef="nom1">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>CONCURRENTE 1</th>

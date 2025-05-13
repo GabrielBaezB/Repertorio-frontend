@@ -63,6 +63,7 @@
       <div class="results-container" *ngIf="registros.length > 0 && !loading">
         <h3>Resultados de la búsqueda</h3>
         <table mat-table [dataSource]="registros">
+           <caption>Buscar Registros</caption>
           <!-- Definición de columnas -->
           <ng-container matColumnDef="nom1">
             <th mat-header-cell *matHeaderCellDef>Concurr. 1</th>
