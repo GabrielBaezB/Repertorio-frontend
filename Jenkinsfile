@@ -105,48 +105,6 @@ pipeline {
             }
         }
 
-        stage('Dockerize') {
-            steps {
-                script {
-                    def buildOutput = sh(script: 'find . -type d -path "*/dist/*" -not -path "*/node_modules/*" | head -1', returnStdout: true).trim()
-
-                    if (buildOutput) {
-                        writeFile file: 'Dockerfile', text: """
-                            FROM nginx:alpine
-                            COPY ${buildOutput} /usr/share/nginx/html
-                            COPY nginx.conf /etc/nginx/conf.d/default.conf
-                            EXPOSE 80
-                            CMD ["nginx", "-g", "daemon off;"]
-                        """
-
-                        writeFile file: 'nginx.conf', text: """
-                            server {
-                                listen 80;
-                                server_name localhost;
-                                root /usr/share/nginx/html;
-                                index index.html;
-
-                                location / {
-                                    try_files \$uri \$uri/ /index.html;
-                                }
-                            }
-                        """
-
-                        def dockerTag = "${env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'master' ? 'prod' : 'dev'}-${env.BUILD_NUMBER}"
-                        sh "docker build -t ${SONAR_PROJECT_KEY}:${dockerTag} ."
-
-                        withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-                            sh "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}"
-                            sh "docker tag ${SONAR_PROJECT_KEY}:${dockerTag} ${DOCKER_USERNAME}/${SONAR_PROJECT_KEY}:${dockerTag}"
-                            sh "docker push ${DOCKER_USERNAME}/${SONAR_PROJECT_KEY}:${dockerTag}"
-                        }
-                    } else {
-                        error "No se encontró el directorio de salida de la compilación"
-                    }
-                }
-            }
-        }
-
         stage('Deploy to Development') {
             when {
                 branch 'develop'
