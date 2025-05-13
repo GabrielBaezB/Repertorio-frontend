@@ -51,7 +51,6 @@ export class AuthService {
     return this.http.post<LoginResponse>(`${this.API_URL}/login`, dto).pipe(
       tap(r => {
         this.accessToken = r.accessToken;
-        // sessionStorage.setItem('access_token', r.accessToken); // opcional
         this.loadUserInfo();
       }),
       catchError(this.handleAuthError('login'))
@@ -77,7 +76,6 @@ export class AuthService {
   /* =========================== LOGOUT ================================ */
   logout(): void {
     this.accessToken = null;
-    // sessionStorage.removeItem('access_token');
     localStorage.removeItem(this.USER_KEY);
     this.currentUserSubject.next(null);
     this.router.navigate(['/login']);

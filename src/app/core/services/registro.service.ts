@@ -130,7 +130,6 @@ export class RegistroService {
     // const url = `/api/export/pdf/${id}`;
     const url = `/api/export/static-pdf/${id}`;
 
-    // console.log('Exportando PDF a través de Netlify:', url);
     console.log('Exportando PDF estático a través de Netlify:', url);
     const headers = new HttpHeaders({ 'ngrok-skip-browser-warning': 'true' });
     return this.http.get(url, {

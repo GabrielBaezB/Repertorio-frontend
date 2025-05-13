@@ -98,9 +98,7 @@ export class PdfGeneratorService {
     add('Año:',             d.ano);
     add('Fecha Escritura:', d.fesc);
     add('Compareciente 1:', d.nom1);
-    // add('RUT 1:', `${d.rut1 ?? ''}${d.rut1d ? '-' + d.rut1d : ''}`);
     add('Compareciente 2:', d.nom2);
-    // add('RUT 2:', `${d.rut2 ?? ''}${d.rut2d ? '-' + d.rut2d : ''}`);
     add('Tipo Documento:',  d.cont);
     add('Materia:',         d.materia);
     add('Requirente:',      d.req);

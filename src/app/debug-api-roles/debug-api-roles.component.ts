@@ -1,7 +1,7 @@
 // src/app/debug-api-roles/debug-api-roles.component.ts
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-debug-api-roles',
