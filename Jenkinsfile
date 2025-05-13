@@ -8,12 +8,18 @@ pipeline {
     environment {
         CHROME_BIN = '/usr/bin/google-chrome'
         NG_CLI_ANALYTICS = 'false'
+        SONAR_SCANNER_HOME = tool 'repertorioQubeScanner'
+        SONAR_PROJECT_KEY = 'repertorio-qube-key'
+        SONAR_PROJECT_NAME = 'Repertorio'
+        DOCKER_HUB_CREDS = credentials('dockerhub-credentials')
     }
 
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
+                // Cache node_modules para builds futuros
+                cache(path: './node_modules', key: "${env.JOB_NAME}-${hashFiles('**/package-lock.json')}")
             }
         }
 
@@ -26,6 +32,7 @@ pipeline {
         stage('Lint') {
             steps {
                 sh 'npx ng lint || true'
+                recordIssues(tools: [esLint(pattern: 'eslint-report.json')])
             }
         }
 
@@ -47,14 +54,43 @@ pipeline {
         //     }
         // }
 
+        stage('Static Code Analysis with SonarQube') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh """
+                        ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
+                        -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+                        -Dsonar.projectName='${SONAR_PROJECT_NAME}' \
+                        -Dsonar.projectVersion=${env.BUILD_NUMBER} \
+                        -Dsonar.sources=src \
+                        -Dsonar.typescript.lcov.reportPaths=coverage/front/lcov.info \
+                        -Dsonar.javascript.lcov.reportPaths=coverage/front/lcov.info
+                    """
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 1, unit: 'HOURS') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage('Security Scan') {
+            steps {
+                sh 'npm audit --json || true'
+                // Opcional: dependencyCheck additionalArguments: '--scan node_modules', odcInstallation: 'OWASP-DC'
+            }
+        }
+
         stage('Build for Development') {
             when {
                 branch 'develop'
             }
             steps {
                 sh 'npx ng build --configuration=development'
-                // Para debug: mostrar dónde están los archivos compilados
-                sh 'find . -type d -name "dist" -o -name "browser" | sort'
             }
         }
 
@@ -66,17 +102,48 @@ pipeline {
             }
             steps {
                 sh 'npx ng build --configuration=production'
-                // Para debug: mostrar dónde están los archivos compilados
-                sh 'find . -type d -name "dist" -o -name "browser" | sort'
             }
         }
 
-        stage('Archive Artifacts') {
+        stage('Dockerize') {
             steps {
-                // Usar patrón más genérico para encontrar los archivos compilados
-                archiveArtifacts artifacts: '**/*.js, **/*.css, **/*.html, **/*.ico, **/*.png, **/*.svg',
-                                 excludes: 'node_modules/**, .git/**',
-                                 fingerprint: true
+                script {
+                    def buildOutput = sh(script: 'find . -type d -path "*/dist/*" -not -path "*/node_modules/*" | head -1', returnStdout: true).trim()
+
+                    if (buildOutput) {
+                        writeFile file: 'Dockerfile', text: """
+                            FROM nginx:alpine
+                            COPY ${buildOutput} /usr/share/nginx/html
+                            COPY nginx.conf /etc/nginx/conf.d/default.conf
+                            EXPOSE 80
+                            CMD ["nginx", "-g", "daemon off;"]
+                        """
+
+                        writeFile file: 'nginx.conf', text: """
+                            server {
+                                listen 80;
+                                server_name localhost;
+                                root /usr/share/nginx/html;
+                                index index.html;
+
+                                location / {
+                                    try_files \$uri \$uri/ /index.html;
+                                }
+                            }
+                        """
+
+                        def dockerTag = "${env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'master' ? 'prod' : 'dev'}-${env.BUILD_NUMBER}"
+                        sh "docker build -t ${SONAR_PROJECT_KEY}:${dockerTag} ."
+
+                        withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                            sh "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}"
+                            sh "docker tag ${SONAR_PROJECT_KEY}:${dockerTag} ${DOCKER_USERNAME}/${SONAR_PROJECT_KEY}:${dockerTag}"
+                            sh "docker push ${DOCKER_USERNAME}/${SONAR_PROJECT_KEY}:${dockerTag}"
+                        }
+                    } else {
+                        error "No se encontró el directorio de salida de la compilación"
+                    }
+                }
             }
         }
 
@@ -86,7 +153,8 @@ pipeline {
             }
             steps {
                 echo 'Deploying to Development environment...'
-                // Comandos de despliegue a ambiente de desarrollo
+                // Ejemplo para despliegue con Docker
+                // sh "ssh user@dev-server 'docker pull username/${SONAR_PROJECT_KEY}:dev-${env.BUILD_NUMBER} && docker-compose up -d'"
             }
         }
 
@@ -97,21 +165,28 @@ pipeline {
                 }
             }
             steps {
+                // Requiere aprobación manual para desplegar a producción
+                input message: '¿Desplegar a producción?', ok: 'Sí'
                 echo 'Deploying to Production environment...'
-                // Comandos de despliegue a producción
+                // Ejemplo para despliegue con Docker
+                // sh "ssh user@prod-server 'docker pull username/${SONAR_PROJECT_KEY}:prod-${env.BUILD_NUMBER} && docker-compose up -d'"
             }
         }
     }
 
     post {
         always {
+            // Limpieza
+            sh 'docker rmi $(docker images -q -f dangling=true) || true'
             deleteDir()
         }
         success {
             echo 'Pipeline executed successfully!'
+            slackSend(color: 'good', message: "ÉXITO: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
         }
         failure {
             echo 'Pipeline execution failed!'
+            slackSend(color: 'danger', message: "FALLO: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
         }
     }
 }
