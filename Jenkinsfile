@@ -27,9 +27,23 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                jobcacher(caches: [[path: 'node_modules']]) {
-                    sh 'npm ci'
-                }
+                // Restaurar caché si existe
+                sh '''
+                    if [ -d ".npm_cache/node_modules" ]; then
+                        echo "Restaurando caché de node_modules..."
+                        cp -R .npm_cache/node_modules ./
+                    fi
+                '''
+
+                // Instalar dependencias
+                sh 'npm ci'
+
+                // Guardar la caché de node_modules
+                sh '''
+                    echo "Guardando caché de node_modules..."
+                    mkdir -p .npm_cache
+                    cp -R node_modules .npm_cache/
+                '''
             }
         }
 
