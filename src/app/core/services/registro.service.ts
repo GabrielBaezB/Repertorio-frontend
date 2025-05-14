@@ -16,9 +16,7 @@ interface PageResponse<T> {
   empty: boolean;
 }
 
-interface SearchParams {
-  [key: string]: string | number | boolean | undefined;
-}
+type SearchParams = Record<string, string | number | boolean | undefined>;
 
 @Injectable({
   providedIn: 'root'

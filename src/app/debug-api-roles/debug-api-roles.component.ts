@@ -4,13 +4,6 @@ import { CommonModule } from '@angular/common';
 import { DebugService } from '../core/services/debug.service';
 import { DebugBaseComponent } from '../shared/components/debug-base/debug-base.component';
 
-// Define ApiResponse interface if not already defined elsewhere
-interface ApiResponse<T = unknown> {
-  data: T;
-  status?: number;
-  statusText?: string;
-  [key: string]: unknown;
-}
 
 @Component({
   selector: 'app-debug-api-roles',
