@@ -4,6 +4,14 @@ import { CommonModule } from '@angular/common';
 import { DebugService } from '../core/services/debug.service';
 import { DebugBaseComponent } from '../shared/components/debug-base/debug-base.component';
 
+// Define ApiResponse interface if not already defined elsewhere
+interface ApiResponse<T = unknown> {
+  data: T;
+  status?: number;
+  statusText?: string;
+  [key: string]: unknown;
+}
+
 @Component({
   selector: 'app-debug-api-roles',
   standalone: true,
@@ -60,11 +68,19 @@ export class DebugApiRolesComponent extends DebugBaseComponent {
     const url = `/api/${endpoint}`;
     const headers = this.debugService.getHeaders(true); // Con autenticación
 
-    this.logRequestDetails(url, 'GET', headers, {});
+    // Convert headers to a plain object
+    const headersObj: Record<string, string | string[]> = {};
+    headers.keys().forEach(key => {
+      const value = headers.getAll(key) || headers.get(key);
+      if (value !== null) {
+        headersObj[key] = value;
+      }
+    });
+    this.logRequestDetails(url, 'GET', headersObj, {});
 
     this.debugService.get(endpoint, undefined, true) // Con autenticación
       .subscribe({
-        next: (data) => this.handleSuccess(data),
+        next: (data) => this.handleSuccess({ data }),
         error: (err) => this.handleError(err)
       });
   }
@@ -75,11 +91,18 @@ export class DebugApiRolesComponent extends DebugBaseComponent {
     const url = this.debugService.getApiUrl(endpoint);
     const headers = this.debugService.getHeaders(true); // Con autenticación
 
-    this.logRequestDetails(url, 'GET', headers, {});
+    const headersObj: Record<string, string | string[]> = {};
+    headers.keys().forEach(key => {
+      const value = headers.getAll(key) || headers.get(key);
+      if (value !== null) {
+        headersObj[key] = value;
+      }
+    });
+    this.logRequestDetails(url, 'GET', headersObj, {});
 
     this.debugService.get(endpoint, undefined, true) // Con autenticación
       .subscribe({
-        next: (data) => this.handleSuccess(data),
+        next: (data) => this.handleSuccess({ data }),
         error: (err) => this.handleError(err)
       });
   }
@@ -90,11 +113,19 @@ export class DebugApiRolesComponent extends DebugBaseComponent {
     const url = this.debugService.getApiUrl(endpoint);
     const headers = this.debugService.getHeaders(true); // Con autenticación
 
-    this.logRequestDetails(url, 'GET', headers, {});
+    // Convert headers to a plain object
+    const headersObj: Record<string, string | string[]> = {};
+    headers.keys().forEach(key => {
+      const value = headers.getAll(key) || headers.get(key);
+      if (value !== null) {
+        headersObj[key] = value;
+      }
+    });
+    this.logRequestDetails(url, 'GET', headersObj, {});
 
     this.debugService.get(endpoint, undefined, true) // Con autenticación
       .subscribe({
-        next: (data) => this.handleSuccess(data),
+        next: (data) => this.handleSuccess({ data }),
         error: (err) => this.handleError(err)
       });
   }

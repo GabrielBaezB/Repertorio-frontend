@@ -82,7 +82,15 @@ export class DebugExportComponent extends DebugBaseComponent {
     const url = this.debugService.getApiUrl(endpoint);
     const headers = this.debugService.getHeaders();
 
-    this.logRequestDetails(url, 'GET', headers, {});
+    // Convert headers to a plain object with proper type definition
+    const headersObj: Record<string, string | string[]> = {};
+    headers.keys().forEach(key => {
+      const value = headers.getAll(key) || headers.get(key);
+      if (value !== null) {
+        headersObj[key] = value;
+      }
+    });
+    this.logRequestDetails(url, 'GET', headersObj, {});
 
     // Usar HttpClient directamente para manejar la respuesta como blob
     this.http.get(url, {
@@ -121,7 +129,16 @@ export class DebugExportComponent extends DebugBaseComponent {
     const headers = this.debugService.getHeaders();
 
     console.log(`Intentando con endpoint alternativo: ${url}`);
-    this.logRequestDetails(url, 'GET', headers, {});
+
+    // Convert headers to a plain object with proper type definition
+    const headersObj: Record<string, string | string[]> = {};
+    headers.keys().forEach(key => {
+      const value = headers.getAll(key) || headers.get(key);
+      if (value !== null) {
+        headersObj[key] = value;
+      }
+    });
+    this.logRequestDetails(url, 'GET', headersObj, {});
 
     this.http.get(url, {
       headers,

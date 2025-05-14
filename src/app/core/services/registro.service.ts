@@ -16,7 +16,9 @@ interface PageResponse<T> {
   empty: boolean;
 }
 
-type SearchParams = Record<string, string | number | boolean | undefined>;
+interface SearchParams {
+  [key: string]: string | number | boolean | undefined;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -65,7 +67,16 @@ export class RegistroService {
   }
 
   search(params: SearchParams): Observable<PageResponse<Registro>> {
-    return this.http.get<PageResponse<Registro>>(`${this.API_URL}/buscar`, { params, headers: { 'ngrok-skip-browser-warning': 'true' } });
+    let httpParams = new HttpParams();
+    Object.keys(params).forEach(key => {
+      if (params[key] !== '' && params[key] !== null && params[key] !== undefined) {
+        httpParams = httpParams.set(key, String(params[key]));
+      }
+    });
+    return this.http.get<PageResponse<Registro>>(`${this.API_URL}/buscar`, {
+      params: httpParams,
+      headers: { 'ngrok-skip-browser-warning': 'true' }
+    });
   }
 
   // ----------------------------------------------------

@@ -5,6 +5,14 @@ import { HttpParams } from '@angular/common/http';
 import { DebugService } from '../core/services/debug.service';
 import { DebugBaseComponent } from '../shared/components/debug-base/debug-base.component';
 
+// Define ApiResponse interface if not already defined elsewhere
+interface ApiResponse<T = unknown> {
+  data: T;
+  status?: number;
+  statusText?: string;
+  [key: string]: unknown;
+}
+
 @Component({
   selector: 'app-debug-api',
   standalone: true,
@@ -60,11 +68,20 @@ export class DebugApiComponent extends DebugBaseComponent {
     const params = this.createPaginationParams();
     const endpoint = 'api/registros';
 
-    this.logRequestDetails(`/api/${endpoint}`, 'GET', {}, params);
+    // Convert params to a plain object
+    const paramsObj: Record<string, string | string[]> = {};
+    params.keys().forEach(key => {
+      const value = params.getAll(key) || params.get(key);
+      if (value !== null) {
+        paramsObj[key] = value;
+      }
+    });
+
+    this.logRequestDetails(`/api/${endpoint}`, 'GET', {}, paramsObj);
 
     this.debugService.get(endpoint, params)
       .subscribe({
-        next: (data) => this.handleSuccess(data),
+        next: (data) => this.handleSuccess({ data }),
         error: (err) => this.handleError(err)
       });
   }
@@ -77,11 +94,29 @@ export class DebugApiComponent extends DebugBaseComponent {
     const url = this.debugService.getApiUrl(endpoint);
     const headers = this.debugService.getHeaders();
 
-    this.logRequestDetails(url, 'GET', headers, params);
+    // Convert headers to a plain object
+    const headersObj: Record<string, string | string[]> = {};
+    headers.keys().forEach(key => {
+      const value = headers.getAll(key) || headers.get(key);
+      if (value !== null) {
+        headersObj[key] = value;
+      }
+    });
+
+    // Convert params to a plain object
+    const paramsObj: Record<string, string | string[]> = {};
+    params.keys().forEach(key => {
+      const value = params.getAll(key) || params.get(key);
+      if (value !== null) {
+        paramsObj[key] = value;
+      }
+    });
+
+    this.logRequestDetails(url, 'GET', headersObj, paramsObj);
 
     this.debugService.get(endpoint, params)
       .subscribe({
-        next: (data) => this.handleSuccess(data),
+        next: (data) => this.handleSuccess({ data }),
         error: (err) => this.handleError(err)
       });
   }
@@ -94,11 +129,31 @@ export class DebugApiComponent extends DebugBaseComponent {
 
     const endpoint = 'registros';
 
-    this.logRequestDetails(this.debugService.getApiUrl(endpoint), 'GET', this.debugService.getHeaders(), params);
+    const headers = this.debugService.getHeaders();
+
+    // Convert headers to a plain object
+    const headersObj: Record<string, string | string[]> = {};
+    headers.keys().forEach(key => {
+      const value = headers.getAll(key) || headers.get(key);
+      if (value !== null) {
+        headersObj[key] = value;
+      }
+    });
+
+    // Convert params to a plain object
+    const paramsObj: Record<string, string | string[]> = {};
+    params.keys().forEach(key => {
+      const value = params.getAll(key) || params.get(key);
+      if (value !== null) {
+        paramsObj[key] = value;
+      }
+    });
+
+    this.logRequestDetails(this.debugService.getApiUrl(endpoint), 'GET', headersObj, paramsObj);
 
     this.debugService.get(endpoint, params)
       .subscribe({
-        next: (data) => this.handleSuccess(data),
+        next: (data) => this.handleSuccess({ data }),
         error: (err) => this.handleError(err)
       });
   }
