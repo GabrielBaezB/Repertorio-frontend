@@ -48,25 +48,6 @@ mat-toolbar {
   z-index: 1000;
 }
 
-.spacer {
-  flex: 1 1 auto;
-}
-
-.brand {
-  font-size: 1.2rem;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-}
-
-.nav-links {
-  display: flex;
-  align-items: center;
-
-  a.active {
-    background-color: rgba(255, 255, 255, 0.15);
-  }
-}
 
 @media (max-width: 768px) {
   .brand span {

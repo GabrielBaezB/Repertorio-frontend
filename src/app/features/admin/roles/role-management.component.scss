@@ -45,17 +45,6 @@ mat-card-actions {
   margin-bottom: 20px;
 }
 
-.table-container {
-  position: relative;
-  min-height: 200px;
-  width: 100%;
-  overflow: auto;
-}
-
-table {
-  width: 100%;
-}
-
 .loading-shade {
   position: absolute;
   top: 0;
@@ -67,10 +56,4 @@ table {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-mat-card-actions {
-  display: flex;
-  justify-content: flex-end;
-  padding: 16px;
 }
