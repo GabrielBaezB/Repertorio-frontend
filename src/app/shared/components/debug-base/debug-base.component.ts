@@ -1,7 +1,29 @@
 // src/app/shared/components/debug-base/debug-base.component.ts
 import { Component } from '@angular/core';
-import { HttpParams } from '@angular/common/http';
+import { HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { DebugService } from '../../../core/services/debug.service';
+
+// Interfaces para mejorar la seguridad de tipos
+interface RequestDetails {
+  url: string;
+  method: string;
+  headers: Record<string, string | string[]>;
+  params: Record<string, string | string[]>;
+}
+
+interface ApiResponse<T = unknown> {
+  data: T;
+  status?: number;
+  statusText?: string;
+  [key: string]: unknown;
+}
+
+interface ErrorDetails {
+  message?: string;
+  status?: number;
+  error?: unknown;
+  [key: string]: unknown;
+}
 
 @Component({
   template: ''
@@ -11,9 +33,9 @@ export class DebugBaseComponent {
   loading = false;
   error: string | null = null;
   errorStatus: number | null = null;
-  errorDetails: any = null;
-  result: any = null;
-  requestDetails: any = null;
+  errorDetails: ErrorDetails | null = null;
+  result: ApiResponse | null = null;
+  requestDetails: RequestDetails | null = null;
 
   // Configuración común
   page = 0;
@@ -33,7 +55,7 @@ export class DebugBaseComponent {
   }
 
   // Método para manejar errores
-  protected handleError(err: any): void {
+  protected handleError(err: HttpErrorResponse): void {
     this.loading = false;
     this.errorStatus = err.status;
     this.error = `Status: ${err.status}. Message: ${err.message}`;
@@ -42,7 +64,7 @@ export class DebugBaseComponent {
   }
 
   // Método para manejar respuestas exitosas
-  protected handleSuccess(data: any): void {
+  protected handleSuccess(data: ApiResponse): void {
     this.loading = false;
     this.result = data;
   }
@@ -56,7 +78,12 @@ export class DebugBaseComponent {
   }
 
   // Método para registrar detalles de la solicitud
-  protected logRequestDetails(url: string, method: string, headers: any, params: any): void {
+  protected logRequestDetails(
+    url: string,
+    method: string,
+    headers: Record<string, string | string[]>,
+    params: Record<string, string | string[]>
+  ): void {
     this.requestDetails = this.debugService.getRequestDetails(url, method, headers, params);
     console.log('Request details:', this.requestDetails);
   }
