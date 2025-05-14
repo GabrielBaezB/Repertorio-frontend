@@ -4,6 +4,14 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
+// Se define la interface for request details
+interface RequestDetails {
+  url: string;
+  method: string;
+  headers: Record<string, string | string[]>;
+  params: Record<string, string | string[]>;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -26,7 +34,7 @@ export class DebugService {
   }
 
   // Método para obtener headers con autenticación opcional
-  getHeaders(includeAuth: boolean = false): HttpHeaders {
+  getHeaders(includeAuth = false): HttpHeaders {
     let headers = new HttpHeaders(this.COMMON_HEADERS);
 
     if (includeAuth) {
@@ -38,7 +46,7 @@ export class DebugService {
   }
 
   // Método genérico para realizar solicitudes GET
-  get<T>(endpoint: string, params?: HttpParams, includeAuth: boolean = false): Observable<T> {
+  get<T>(endpoint: string, params?: HttpParams, includeAuth = false): Observable<T> {
     const url = this.getApiUrl(endpoint);
     const headers = this.getHeaders(includeAuth);
 
@@ -51,7 +59,7 @@ export class DebugService {
   }
 
   // Método para obtener detalles de la solicitud (para mostrar en UI)
-  getRequestDetails(url: string, method: string, headers: any, params: any): any {
+  getRequestDetails(url: string, method: string, headers: Record<string, string | string[]>, params: Record<string, string | string[]>): RequestDetails {
     return {
       url,
       method,
@@ -61,7 +69,7 @@ export class DebugService {
   }
 
   // Método específico para obtener blobs (PDF, Excel, etc.)
-  getBlobResponse(endpoint: string, params?: HttpParams, includeAuth: boolean = false): Observable<Blob> {
+  getBlobResponse(endpoint: string, params?: HttpParams, includeAuth = false): Observable<Blob> {
     const url = this.getApiUrl(endpoint);
     const headers = this.getHeaders(includeAuth);
 

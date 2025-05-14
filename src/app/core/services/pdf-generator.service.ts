@@ -6,6 +6,28 @@ import autoTable from 'jspdf-autotable';
 import { environment } from '../../../environments/environment';
 import { Registro } from '../models/registro.model';
 
+interface PdfData {
+  nro?: string | number;
+  foj?: string | number;
+  ano?: string | number;
+  fesc?: string;
+  nom1?: string;
+  nom2?: string;
+  cont?: string;
+  materia?: string;
+  req?: string;
+  abog?: string;
+  nBoleta?: string | number;
+  aran?: string | number;
+  observacion?: string;
+  [key: string]: string | number | undefined;
+}
+
+interface JsPDFWithAutoTable extends jsPDF {
+  lastAutoTable: {
+    finalY: number;
+  };
+}
 @Injectable({ providedIn: 'root' })
 export class PdfGeneratorService {
 
@@ -26,7 +48,7 @@ export class PdfGeneratorService {
   private getData(id: number) {
     const headers = new HttpHeaders({ 'ngrok-skip-browser-warning': 'true' });
 
-    return this.http.get<any>(`${this.BASE}/export/pdf-data/${id}`, { headers }).pipe(
+    return this.http.get<PdfData>(`${this.BASE}/export/pdf-data/${id}`, { headers }).pipe(
       catchError(err => {
         console.error('No se pudo obtener el registro', err);
         return throwError(() => new Error('No se pudo obtener el registro'));
@@ -76,7 +98,7 @@ export class PdfGeneratorService {
     };
   }
 
-  private buildPdf(id: number, d: any) {
+  private buildPdf(id: number, d: PdfData) {
     const doc = new jsPDF();
 
     /* ---------- Cabecera ---------- */
@@ -90,7 +112,7 @@ export class PdfGeneratorService {
 
     /* ---------- Tabla ---------- */
     const body: string[][] = [];
-    const add = (k: string, v?: any) =>
+    const add = (k: string, v?: string | number ) =>
       v !== undefined && v !== null && v !== '' && body.push([k, String(v)]);
 
     add('N.º Repertorio:', d.nro);
@@ -121,7 +143,7 @@ export class PdfGeneratorService {
     });
 
     /* ---------- Pie ---------- */
-    const y = (doc as any).lastAutoTable.finalY + 15;
+    const y = (doc as JsPDFWithAutoTable).lastAutoTable.finalY + 15;
     doc.setFontSize(9);
     doc.text(
       'Este documento es constancia del registro notarial y no constituye copia autorizada del instrumento.',

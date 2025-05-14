@@ -26,9 +26,9 @@ import { AuthService } from '../../../core/services/auth.service';
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent implements OnInit {
-  username: string = '';
+  username = '';
   roles: string[] = [];
-  isAdmin: boolean = false;
+  isAdmin = false;
 
   constructor(private authService: AuthService) {}
 

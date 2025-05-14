@@ -48,7 +48,7 @@ export class DebugBaseComponent {
   }
 
   // Método para crear parámetros de paginación
-  protected createPaginationParams(page: number = this.page, size: number = this.size, sort: string = 'createdAt,desc'): HttpParams {
+  protected createPaginationParams(page: number = this.page, size: number = this.size, sort = 'createdAt,desc'): HttpParams {
     return new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString())

@@ -12,6 +12,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Role } from '../../../core/models/role.model';
 import { RoleService } from '../../../core/services/role.service';
 import { RoleDialogComponent } from './role-dialog/role-dialog.component';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-role-management',
@@ -52,7 +53,7 @@ export class RoleManagementComponent implements OnInit {
         this.roles = roles;
         this.loading = false;
       },
-      error: (error: any) => {
+      error: (error: HttpErrorResponse) => {
         console.error('Error loading roles', error);
         this.snackBar.open('Error al cargar roles', 'Cerrar', { duration: 3000 });
         this.loading = false;
@@ -75,7 +76,7 @@ export class RoleManagementComponent implements OnInit {
               this.snackBar.open('Rol actualizado correctamente', 'Cerrar', { duration: 3000 });
               this.loadRoles();
             },
-            error: (error: any) => {
+            error: (error: HttpErrorResponse) => {
               console.error('Error updating role', error);
               this.snackBar.open('Error al actualizar rol', 'Cerrar', { duration: 3000 });
             }
@@ -87,7 +88,7 @@ export class RoleManagementComponent implements OnInit {
               this.snackBar.open('Rol creado correctamente', 'Cerrar', { duration: 3000 });
               this.loadRoles();
             },
-            error: (error: any) => {
+            error: (error: HttpErrorResponse) => {
               console.error('Error creating role', error);
               this.snackBar.open('Error al crear rol', 'Cerrar', { duration: 3000 });
             }
@@ -117,7 +118,7 @@ export class RoleManagementComponent implements OnInit {
           this.snackBar.open('Rol eliminado correctamente', 'Cerrar', { duration: 3000 });
           this.loadRoles();
         },
-        error: (error) => {
+        error: (error: HttpErrorResponse) => {
           console.error('Error al eliminar rol', error);
           this.snackBar.open('Error al eliminar rol', 'Cerrar', { duration: 3000 });
         }

@@ -19,6 +19,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'; /
 import { User } from '../../../../core/models/user.model';
 import { UserService } from '../../../../core/services/user.service';
 import { PasswordResetDialogComponent } from '../../../../shared/components/password-reset-dialog/password-reset-dialog.component';
+import { Role } from '../../../../core/models/role.model';
+
+type RoleType = string | Role;
 
 @Component({
   selector: 'app-user-list',
@@ -52,6 +55,8 @@ export class UserListComponent implements OnInit {
   searchForm: FormGroup;
   displayedColumns: string[] = ['username', 'fullName', 'email', 'roles', 'enabled', 'actions'];
   loading = false;
+
+
 
   constructor(
     private userService: UserService,
@@ -198,7 +203,7 @@ export class UserListComponent implements OnInit {
   }
 
   // Añadir este método
-  displayRoleName(role: any): string {
+  displayRoleName(role: RoleType): string {
     if (typeof role === 'string') {
       return role.replace('ROLE_', '');
     } else if (role && typeof role === 'object' && role.name) {

@@ -41,7 +41,7 @@ import { SystemConfigService } from '../../../core/services/system-config.servic
 })
 export class SystemConfigComponent implements OnInit {
   configs: SystemConfig[] = [];
-  configForms: { [key: string]: FormGroup } = {};
+  configForms: Record<string, FormGroup> = {};
   displayedColumns: string[] = ['key', 'value', 'description', 'actions'];
   loading = false;
 

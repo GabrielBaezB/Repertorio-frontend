@@ -5,34 +5,61 @@ import { catchError, Observable, tap, throwError } from 'rxjs';
 import { User } from '../models/user.model';
 import { environment } from '../../../environments/environment';
 
+// Define interfaces for type safety
+interface PageResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
+  empty: boolean;
+}
+
+interface UserCreateDTO {
+  username: string;
+  password: string;
+  email?: string;
+  fullName?: string;
+  enabled?: boolean;
+  roles: string[] | number[];
+}
+
+interface UserUpdateDTO {
+  email?: string;
+  fullName?: string;
+  enabled?: boolean;
+  roles?: string[] | number[];
+  password?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  // private readonly API_URL = `${environment.apiUrl}/users`;
-
   private readonly API_URL = environment.production
-  ? 'https://50fa-201-219-233-176.ngrok-free.app/api/users'  // URL directa
-  : `${environment.apiUrl}/api/users`;  // URL de desarrollo
+    ? 'https://50fa-201-219-233-176.ngrok-free.app/api/users'  // URL directa
+    : `${environment.apiUrl}/api/users`;  // URL de desarrollo
 
   constructor(private http: HttpClient) {
     console.log('API_URL configurada:', this.API_URL);
-   }
+  }
 
-  getAll(page = 0, size = 10, sort = 'createdAt,desc'): Observable<any> {
+  getAll(page = 0, size = 10, sort = 'createdAt,desc'): Observable<PageResponse<User>> {
     console.log(`Consultando usuarios - página ${page}, tamaño ${size}`);
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString())
       .set('sort', sort);
 
-      // Añadir encabezados específicos para ngrok
-      console.log('Parámetros:', params.toString());
-      const headers = new HttpHeaders({ 'ngrok-skip-browser-warning': 'true' });
+    // Añadir encabezados específicos para ngrok
+    console.log('Parámetros:', params.toString());
+    const headers = new HttpHeaders({ 'ngrok-skip-browser-warning': 'true' });
 
-      console.log('Getting users from:', this.API_URL);
+    console.log('Getting users from:', this.API_URL);
 
-    return this.http.get<any>(this.API_URL, { params, headers }).pipe(
+    return this.http.get<PageResponse<User>>(this.API_URL, { params, headers }).pipe(
       tap(response => {
         console.log('===== Respuesta del servidor =====');
         console.log('Datos recibidos:', response);
@@ -61,7 +88,7 @@ export class UserService {
     return this.http.get<User>(`${this.API_URL}/${id}`);
   }
 
-  create(userData: any): Observable<User> {
+  create(userData: UserCreateDTO): Observable<User> {
     console.log('Creando usuario con datos:', userData);
     return this.http.post<User>(this.API_URL, userData).pipe(
       tap(response => console.log('Respuesta al crear usuario:', response)),
@@ -72,7 +99,7 @@ export class UserService {
     );
   }
 
-  update(id: number, userData: any): Observable<User> {
+  update(id: number, userData: UserUpdateDTO): Observable<User> {
     console.log(`Actualizando usuario ${id} con datos:`, userData);
     return this.http.put<User>(`${this.API_URL}/${id}`, userData).pipe(
       tap(response => console.log('Respuesta al actualizar usuario:', response)),
@@ -100,13 +127,13 @@ export class UserService {
     );
   }
 
-  search(term: string, page = 0, size = 10): Observable<any> {
+  search(term: string, page = 0, size = 10): Observable<PageResponse<User>> {
     const params = new HttpParams()
       .set('term', term)
       .set('page', page.toString())
       .set('size', size.toString());
 
-    return this.http.get<any>(`${this.API_URL}/search`, { params, headers: { 'ngrok-skip-browser-warning': 'true' } }).pipe(
+    return this.http.get<PageResponse<User>>(`${this.API_URL}/search`, { params, headers: { 'ngrok-skip-browser-warning': 'true' } }).pipe(
       catchError(error => {
         console.error('Error searching users', error);
         return throwError(() => new Error('Error buscando usuarios'));

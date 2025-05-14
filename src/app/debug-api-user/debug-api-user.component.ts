@@ -2,7 +2,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpParams } from '@angular/common/http';
 import { DebugService } from '../core/services/debug.service';
 import { DebugBaseComponent } from '../shared/components/debug-base/debug-base.component';
 
@@ -80,7 +79,7 @@ import { DebugBaseComponent } from '../shared/components/debug-base/debug-base.c
   `
 })
 export class DebugApiUserComponent extends DebugBaseComponent {
-  customPath: string = '';
+  customPath = '';
 
   constructor(protected override debugService: DebugService) {
     super(debugService);

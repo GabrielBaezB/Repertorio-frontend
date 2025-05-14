@@ -22,9 +22,9 @@ import { AuthService } from '../../../core/services/auth.service';
   styleUrl: './navbar.component.scss'
 })
 export class NavbarComponent implements OnInit {
-  username: string = '';
+  username = '';
   roles: string[] = [];
-  isAdmin: boolean = false;
+  isAdmin = false;
 
   constructor(private authService: AuthService) {}
 

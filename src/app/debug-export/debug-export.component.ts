@@ -2,9 +2,15 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { DebugService } from '../core/services/debug.service';
 import { DebugBaseComponent } from '../shared/components/debug-base/debug-base.component';
+
+interface HttpErrorResponse {
+  status: number;
+  message: string;
+  error?: unknown;
+}
 
 @Component({
   selector: 'app-debug-export',
@@ -104,7 +110,7 @@ export class DebugExportComponent extends DebugBaseComponent {
   }
 
   // Método para determinar si se debe intentar con un endpoint alternativo
-  private shouldTryAlternativeEndpoint(err: any): boolean {
+  private shouldTryAlternativeEndpoint(err: HttpErrorResponse): boolean {
     return err.status === 404 || err.status === 500;
   }
 
