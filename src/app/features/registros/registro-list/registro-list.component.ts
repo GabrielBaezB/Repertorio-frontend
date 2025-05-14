@@ -87,7 +87,7 @@ export class RegistroListComponent implements OnInit {
 
 obs$.subscribe({
   next: data => {
-    const filtrados = (data.content as Registro[]).filter((r: Registro) =>
+    const filtrados = data.content.filter((r: Registro) =>
       (r.nom1?.trim().length ?? 0) > 0 ||
       (r.nro?.trim().length  ?? 0) > 0
     );
