@@ -31,18 +31,9 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   margin-bottom: 16px;
 }
 // Agregar estos estilos a tu archivo styles.scss global
-html, body {
+html {
   height: 100%;
   margin: 0;
-}
-
-body {
-  font-family: Roboto, "Helvetica Neue", sans-serif;
-  background-color: #f5f5f5;
-}
-
-.container {
-  padding: 16px;
 }
 
 // Estilos para páginas de error
@@ -77,21 +68,4 @@ body {
   justify-content: center;
   align-items: center;
   padding: 20px;
-}
-
-// Clases de utilidad
-.text-center {
-  text-align: center;
-}
-
-.mt-2 {
-  margin-top: 16px;
-}
-
-.mb-2 {
-  margin-bottom: 16px;
-}
-
-.full-width {
-  width: 100%;
 }
