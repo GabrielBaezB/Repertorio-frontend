@@ -113,45 +113,45 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
-            when { expression { params.ENVIRONMENT != 'none' } }
-            environment {
-                DEV_SERVER = credentials('dev-server-creds') // Jenkins credential
-                PROD_SERVER = credentials('prod-server-creds') // Jenkins credential
-            }
-            steps {
-                script {
-                    def server = params.ENVIRONMENT == 'production' ? env.PROD_SERVER : env.DEV_SERVER
-                    def deployPath = params.ENVIRONMENT == 'production' ? '/path/to/production/' : '/path/to/development/'
+        // stage('Deploy') {
+        //     when { expression { params.ENVIRONMENT != 'none' } }
+        //     environment {
+        //         DEV_SERVER = credentials('dev-server-creds') // Jenkins credential
+        //         PROD_SERVER = credentials('prod-server-creds') // Jenkins credential
+        //     }
+        //     steps {
+        //         script {
+        //             def server = params.ENVIRONMENT == 'production' ? env.PROD_SERVER : env.DEV_SERVER
+        //             def deployPath = params.ENVIRONMENT == 'production' ? '/path/to/production/' : '/path/to/development/'
 
-                    sh """
-                        rsync -avz --delete ./dist/browser/ ${server}:${deployPath}
-                    """
-                }
-            }
-        }
+        //             sh """
+        //                 rsync -avz --delete ./dist/browser/ ${server}:${deployPath}
+        //             """
+        //         }
+        //     }
+        // }
 
-        stage('Validate Deployment') {
-            when { expression { params.ENVIRONMENT != 'none' } }
-            steps {
-                script {
-                    def url = params.ENVIRONMENT == 'production' ? 'https://prod.example.com' : 'https://dev.example.com'
-                    sh """
-                        for i in {1..10}; do
-                            if curl -s -f ${url}; then
-                                echo "Deployment validation successful!"
-                                exit 0
-                            else
-                                echo "Attempt \$i/10 failed, retrying in 10s..."
-                                sleep 10
-                            fi
-                        done
-                        echo "Deployment validation failed!"
-                        exit 1
-                    """
-                }
-            }
-        }
+        // stage('Validate Deployment') {
+        //     when { expression { params.ENVIRONMENT != 'none' } }
+        //     steps {
+        //         script {
+        //             def url = params.ENVIRONMENT == 'production' ? 'https://prod.example.com' : 'https://dev.example.com'
+        //             sh """
+        //                 for i in {1..10}; do
+        //                     if curl -s -f ${url}; then
+        //                         echo "Deployment validation successful!"
+        //                         exit 0
+        //                     else
+        //                         echo "Attempt \$i/10 failed, retrying in 10s..."
+        //                         sleep 10
+        //                     fi
+        //                 done
+        //                 echo "Deployment validation failed!"
+        //                 exit 1
+        //             """
+        //         }
+        //     }
+        // }
     }
 
     post {
