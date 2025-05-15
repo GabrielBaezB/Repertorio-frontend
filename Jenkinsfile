@@ -162,14 +162,12 @@ pipeline {
             emailext (
                 subject: "BUILD SUCCESS: ${currentBuild.fullDisplayName}",
                 body: "El pipeline se ha ejecutado correctamente. Ver detalles: ${env.BUILD_URL}",
-                recipientProviders: [[$class: 'DevelopersRecipientProvider']]
             )
         }
         failure {
             emailext (
                 subject: "BUILD FAILED: ${currentBuild.fullDisplayName}",
                 body: "El pipeline ha fallado. Ver detalles: ${env.BUILD_URL}",
-                recipientProviders: [[$class: 'DevelopersRecipientProvider']]
             )
         }
     }
