@@ -59,7 +59,7 @@
 
           <ng-container matColumnDef="fesc">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>FECHA ESCRITURA</th>
-            <td mat-cell *matCellDef="let registro">{{ registro.fesc }}</td>
+            <td mat-cell *matCellDef="let registro">{{ registro.fesc | date: 'dd/MM/yyyy'}}</td>
           </ng-container>
 
           <ng-container matColumnDef="actions">
