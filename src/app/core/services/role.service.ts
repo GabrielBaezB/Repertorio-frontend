@@ -12,7 +12,7 @@ export class RoleService {
   // private readonly API_URL = `${environment.apiUrl}/roles`;
 
   private readonly API_URL = environment.production
-    ? 'https://c534-201-219-234-178.ngrok-free.app/api/roles'  // URL directa
+    ? 'https://e4c6-2800-150-150-1e92-fdda-4273-98e3-222b.ngrok-free.app/api/roles'  // URL directa
     : `${environment.apiUrl}/api/roles`;
      // URL de desarrollo
   constructor(private http: HttpClient) {

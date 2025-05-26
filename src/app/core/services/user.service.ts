@@ -39,7 +39,7 @@ interface UserUpdateDTO {
 })
 export class UserService {
   private readonly API_URL = environment.production
-    ? 'https://c534-201-219-234-178.ngrok-free.app/api/users'  // URL directa
+    ? 'https://e4c6-2800-150-150-1e92-fdda-4273-98e3-222b.ngrok-free.app/api/users'  // URL directa
     : `${environment.apiUrl}/api/users`;  // URL de desarrollo
 
   constructor(private http: HttpClient) {
