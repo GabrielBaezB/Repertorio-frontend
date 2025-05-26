@@ -55,7 +55,7 @@
         </div>
 
         <div class="form-row">
-          <mat-form-field appearance="outline">
+          <!-- <mat-form-field appearance="outline">
             <mat-label>Materia</mat-label>
             <mat-select formControlName="materia" required>
               <mat-option *ngFor="let materia of materias" [value]="materia">
@@ -65,7 +65,15 @@
             <mat-error *ngIf="submitted && registroForm.get('materia')?.errors?.['required']">
               Este campo es obligatorio
             </mat-error>
+          </mat-form-field> -->
+          <mat-form-field appearance="outline">
+            <mat-label>Materia</mat-label>
+            <input matInput formControlName="materia" required>
+            <mat-error *ngIf="submitted && registroForm.get('materia')?.errors?.['required']">
+              Este campo es obligatorio
+            </mat-error>
           </mat-form-field>
+
 
           <mat-form-field appearance="outline">
             <mat-label>Fecha Escritura</mat-label>
