@@ -54,7 +54,7 @@
 
           <ng-container matColumnDef="ano">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Año</th>
-            <td mat-cell *matCellDef="let registro">{{ registro.ano | date: 'dd/MM/yyyy'}}</td>
+            <td mat-cell *matCellDef="let registro">{{ registro.ano | date: 'yyyy'}}</td>
           </ng-container>
 
           <ng-container matColumnDef="fesc">
