@@ -23,7 +23,7 @@ type SearchParams = Record<string, string | number | boolean | undefined>;
 })
 export class RegistroService {
   private readonly API_URL = environment.production
-    ? 'https://e4c6-2800-150-150-1e92-fdda-4273-98e3-222b.ngrok-free.app/api/registros'  // URL directa
+    ? 'https://1c2d-186-189-78-119.ngrok-free.app/api/registros'  // URL directa
     : `${environment.apiUrl}/api/registros`;  // URL de desarrollo
 
   constructor(private http: HttpClient) {

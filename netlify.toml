@@ -3,7 +3,7 @@
 
 [[redirects]]
   from = "/api/*"
-  to = "https://e4c6-2800-150-150-1e92-fdda-4273-98e3-222b.ngrok-free.app/:splat"
+  to = "https://1c2d-186-189-78-119.ngrok-free.app/:splat"
   status = 200
   force = true
   headers = {Access-Control-Allow-Origin = "https://repertorionotarial.netlify.app"}
