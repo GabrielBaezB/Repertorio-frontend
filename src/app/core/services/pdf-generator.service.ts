@@ -36,7 +36,7 @@ export class PdfGeneratorService {
    *  seguir usando el endpoint pdf-data/{id}.
    * ---------------------------------------------------*/
   private readonly BASE = environment.production
-    ? 'https://1c2d-186-189-78-119.ngrok-free.app/api'
+    ? 'https://4226-186-189-73-55.ngrok-free.app/api'
     : '/api';
 
   constructor(private http: HttpClient) {}
